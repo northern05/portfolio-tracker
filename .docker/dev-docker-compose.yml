@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  redis-agent:
+    image: redis/redis-stack:latest
+    container_name:
+      redis-agent
+    env_file:
+      - ../.envs/.dev
+    environment:
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD} --user ${REDIS_USER} on >${REDIS_PASSWORD} ~* allcommands --user default off nopass nocommands"
+    ports:
+      - "6379:6379"
+      - ${REDIS_PORT}:${REDIS_PORT}
+    expose:
+      - ${REDIS_PORT}
+    restart: always
+    volumes:
+      - /srv/redis:/data
+    networks:
+      - dev_agent
+    hostname: redis-agent
+
+  postgres-agent:
+    image: postgres:latest
+    env_file:
+      - ../.envs/.dev
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PW}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    container_name:
+      postgres-agent
+    expose:
+      - ${DB_PORT}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    networks:
+      - dev_agent
+    volumes:
+      - /srv/psql:/var/lib/postgresql/data
+    restart: always
+    hostname: postgres-agent
+
+  dev-back-agent:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    env_file:
+      - ../.envs/.dev
+    image:
+      dev-back-agent
+    container_name:
+      dev-back-agent
+    ports:
+      - "6010:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - dev_agent
+    volumes:
+      - ../:/usr/src/app
+    restart: always
+    command: bash -c 'uvicorn main:app --proxy-headers --host 0.0.0.0'
+    depends_on:
+      - redis-agent
+      - postgres-agent
+    hostname: dev-back-agent
+
+
+networks:
+  dev_agent: { }
