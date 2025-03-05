@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey, Boolean
+from sqlalchemy import String, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -6,11 +6,8 @@ from .user import User
 
 
 class Portfolio(Base):
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
-    user: Mapped["User"] = relationship(backref="credits")
     symbol = mapped_column(String, nullable=False, index=True)
-    name = mapped_column(String, nullable=False, index=True)
-    token_address: Mapped[str] = mapped_column(String, nullable=False)
+    period_days: Mapped[int] = mapped_column(Integer, nullable=False)
 
     def __repr__(self):
-        return f"<Credits for user{self.user_id}>"
+        return f"<Portfolio for user {self.user_id}, by asset {self.symbol}, with period {self.period}>"
