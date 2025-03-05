@@ -14,7 +14,7 @@ from app.core.errors import errors
 from app.core.modules_factory import twitter_driver, solana_driver
 from app.llm.db_util import get_db_session
 from utils.dexscreener import fetch_dexscreener_data
-from utils.elfa import get_top_posts, PostsTimeWindow
+from utils.elfa_driver import get_top_posts, PostsTimeWindow
 from utils.error import DexScreenerTokenError
 from utils.raydium import get_pool_info, get_pool_address_from_mint, get_pool_quote_token_info
 

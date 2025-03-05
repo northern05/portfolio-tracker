@@ -26,3 +26,9 @@ class PortfolioResponseExtended(PortfolioBase):
     sentiment_score: str
     related_news: list
     current_price: float
+
+
+class SimilarAssetsResponse(BaseModel):
+    symbol: str
+    name: str
+    image_url: str

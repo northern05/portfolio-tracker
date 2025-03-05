@@ -6,7 +6,8 @@ from app.api.auth import dependencies as auth_dependencies
 from app.core.errors import errors
 from app.core.models import db_helper, User
 from . import crud
-from .schemas import PortfolioResponse, PortfolioCreate
+from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse
+from app.core.modules_factory import cmc_driver, perplexity_driver, el
 
 
 async def create_portfolio(
@@ -21,7 +22,7 @@ async def create_portfolio(
 async def get_all_portfolio(
         user: User = Depends(auth_dependencies.check_wallet),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-) -> list:
+) -> list[PortfolioResponse]:
     res = await crud.get_users_assets(session=session, user_id=user.id)
     return res
 
@@ -31,7 +32,7 @@ async def get_selected_portfolio(
         user: User = Depends(auth_dependencies.check_wallet),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 
-):
+) -> PortfolioResponse:
     portfolio = await crud.get_by_id(session=session, portfolio_id=portfolio_id)
     if not portfolio:
         await session.close()
@@ -41,3 +42,10 @@ async def get_selected_portfolio(
         )
     response_data = PortfolioResponse.from_orm(portfolio)
     return response_data
+
+
+async def get_similar_assets(
+        asset_symbol: str
+) -> list[SimilarAssetsResponse]:
+    similar_assets = cmc_driver.get_similar_tokens(symbol=asset_symbol)
+    return [SimilarAssetsResponse.from_orm(asset) for asset in similar_assets]

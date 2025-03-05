@@ -2,12 +2,8 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, status, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.auth.dependencies import check_wallet
-from . import crud, dependencies, schemas
-from app.core.models import db_helper, User
-from app.core.models.base import ActionParameter
+from . import dependencies, schemas
 
 router = APIRouter(tags=["Portfolio"])
 
@@ -30,6 +26,21 @@ async def get_all_messages_count(
     return result
 
 
+@router.post(
+    "",
+    status_code=status.HTTP_200_OK,
+    response_model=schemas.PortfolioResponse,
+)
+async def create_portfolio(
+        result: schemas.PortfolioResponse = Depends(dependencies.create_portfolio)
+):
+    """
+    Endpoint to get portfolio over user
+    :param session: session to connect to database
+    :return: list portfolio
+    """
+    return result
+
 
 @router.get(
     "/{portfolio_id}",
@@ -41,27 +52,22 @@ async def get_selected_portfolio(
 ):
     """
     Endpoint to get selected portfolio over user
-    :param user: user address
+    :param portfolio_id: portfolio id
     :return: portfolio extended schema
     """
     return result
 
+
 @router.get(
-    "/users",
+    "/similar_assets",
     status_code=status.HTTP_200_OK,
-    response_model=UsersCountResponse,
+    response_model=list[schemas.SimilarAssetsResponse],
 )
-async def get_all_users_count(
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+async def get_similar_assets(
+        result: list[schemas.SimilarAssetsResponse] = Depends(dependencies.get_similar_assets)
 ):
     """
-    Endpoint to get portfolio over users
-    :param session: session to connect to database
-    :return: users portfolio
+    Endpoint to get similar assets
+    :return: similar_assets
     """
-    logger.info("Received get users count request")
-
-    count = await crud.get_unique_users_count(
-        session=session,
-    )
-    return UsersCountResponse(total_users=count)
+    return result

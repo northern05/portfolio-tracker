@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 
 COOKIE_SESSION_ID_KEY: str = os.environ.get("COOKIE_SESSION_ID_KEY", "agent-session-id")
 
+
 # dotenv.load_dotenv()
 
 class Config(BaseSettings):
@@ -27,10 +28,6 @@ class DBSettings(BaseSettings):
     )
     db_echo: bool = False
 
-class SolanaSettings(BaseSettings):
-    RPC_URL: str = os.environ.get("RPC_URL")
-    SOLANA_CONFIG_PATH: str = os.environ.get("SOLANA_CONFIG_PATH")
-    AGENT_KEYPAIR: str = os.environ.get("AGENT_KEYPAIR")
 
 class TwitterSettings(BaseSettings):
     API_KEY: str = os.environ.get("API_KEY")
@@ -40,8 +37,24 @@ class TwitterSettings(BaseSettings):
     BEARER_TOKEN: str = os.environ.get("BEARER_TOKEN")
 
 
+class CoinMarketCapSettings(BaseSettings):
+    CMC_URL: str = os.environ.get("CMC_URL")
+    CMC_API_KEY: str = os.environ.get("CMC_API_KEY")
+
+
+class ElfaSettings(BaseSettings):
+    ELFA_URL: str = os.environ.get("CMC_URL")
+    ELFA_API_KEY: str = os.environ.get("ELFA_API_KEY")
+
+
+class PerplexitySettings(BaseSettings):
+    PERPLEXITY_URL: str = os.environ.get("PERPLEXITY_URL")
+    PERPLEXITY_API_KEY: str = os.environ.get("ELFA_API_KEY")
+
+
 config = Config()
 db_config = DBSettings()
-solana_config = SolanaSettings()
+cmc_config = CoinMarketCapSettings()
 twitter_settings = TwitterSettings()
-solana_settings = SolanaSettings()
+elfa_config = ElfaSettings()
+perplexity_config = PerplexitySettings()
