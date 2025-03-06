@@ -52,7 +52,6 @@ pytest==8.1.1
 python-dotenv==1.0.1
 pyunormalize==15.1.0
 PyYAML==6.0.1
-redis==5.0.4
 referencing==0.35.0
 requests==2.31.0
 sniffio==1.3.1
@@ -69,19 +68,9 @@ watchfiles==0.21.0
 web3==6.17.2
 yarl==1.9.4
 apscheduler==3.10.4
-BeautifulSoup4==4.12.3
-fastembed==0.2.7
 html2text==2024.2.26
-langgraph
-langchain==0.3.19
-langchain-community==0.3.18
 jinja2==3.1.4
-jsonpickle==3.2.1
-siwe==4.1.0
 psutil
 unstructured==0.14.10
-python-telegram-bot==21.4
 openai==1.59.5
 solders==0.23.0
-solana==0.36.3
-tweepy==4.15.0
