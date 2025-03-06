@@ -1,23 +1,14 @@
 import requests
 
-from enum import Enum
-
-
-class PostsTimeWindow(Enum):
-    HOUR = '1h'
-    DAILY = '24h'
-    WEEKLY = '7d'
-
 
 class ElfaDriver:
     def __init__(self, base_url: str, api_key: str):
         self.ELFA_URL = base_url
         self.ELFA_API_KEY = api_key
 
-    def get_top_posts(self, asset: str, time_window: PostsTimeWindow = PostsTimeWindow.HOUR, page: int = 1,
+    def get_top_posts(self, symbol: str, time_window: str = "1d", page: int = 1,
                       page_size: int = 10):
-        from app import config
-        url = f'{self.ELFA_URL}/top-mentions?ticker={asset}&timeWindow={time_window.value}&page={page}&pageSize={page_size}'
+        url = f'{self.ELFA_URL}/top-mentions?ticker={symbol}&timeWindow={time_window}&page={page}&pageSize={page_size}'
         headers = {
             'x-elfa-api-key': self.ELFA_API_KEY
         }

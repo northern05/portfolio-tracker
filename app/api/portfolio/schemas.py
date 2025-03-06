@@ -23,9 +23,9 @@ class PortfolioResponse(PortfolioBase):
 
 
 class PortfolioResponseExtended(PortfolioBase):
-    sentiment_score: str
-    related_news: list
-    current_price: float
+    sentiment_score: str | None = None
+    related_news: list | None = None
+    current_price: float | None = None
 
 
 class SimilarAssetsResponse(BaseModel):

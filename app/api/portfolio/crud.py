@@ -25,6 +25,7 @@ async def create(session: AsyncSession, portfolio_data: PortfolioCreate, user_id
             **portfolio_data.model_dump(),
         )
         session.add(portfolio)
+        await session.commit()
     portfolio_user = PortfolioUser(portfolio_id=portfolio.id, user_id=user_id)
     session.add(portfolio_user)
     await session.commit()

@@ -6,8 +6,8 @@ from app.api.auth import dependencies as auth_dependencies
 from app.core.errors import errors
 from app.core.models import db_helper, User
 from . import crud
-from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse
-from app.core.modules_factory import cmc_driver, perplexity_driver, el
+from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, PortfolioResponseExtended
+from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver
 
 
 async def create_portfolio(
@@ -29,10 +29,10 @@ async def get_all_portfolio(
 
 async def get_selected_portfolio(
         portfolio_id: Annotated[int, Path],
-        user: User = Depends(auth_dependencies.check_wallet),
+        # user: User = Depends(auth_dependencies.check_wallet),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 
-) -> PortfolioResponse:
+) -> PortfolioResponseExtended:
     portfolio = await crud.get_by_id(session=session, portfolio_id=portfolio_id)
     if not portfolio:
         await session.close()
@@ -40,7 +40,14 @@ async def get_selected_portfolio(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=errors.projects.PROJECT_NOT_FOUND
         )
-    response_data = PortfolioResponse.from_orm(portfolio)
+    response_data = PortfolioResponseExtended.from_orm(portfolio)
+    response_data.current_price = cmc_driver.get_current_token_price(symbol=portfolio.symbol)
+    response_data.sentiment_score = elfa_driver.get_top_posts(
+        symbol=portfolio.symbol,
+        time_window=f"{portfolio.period_days}d"
+    )
+    message = f"Tell me last important news about {portfolio.symbol}"
+    response_data.related_news = perplexity_driver.chat_without_streaming(message=message)
     return response_data
 
 
