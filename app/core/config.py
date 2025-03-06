@@ -2,8 +2,6 @@ import os
 
 from pydantic_settings import BaseSettings
 
-COOKIE_SESSION_ID_KEY: str = os.environ.get("COOKIE_SESSION_ID_KEY", "agent-session-id")
-
 
 class Config(BaseSettings):
     api_v1_prefix: str = "/portfolio_tracker/api/v1"
