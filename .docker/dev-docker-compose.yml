@@ -34,7 +34,7 @@ services:
     container_name:
       dev-portfolio-tracker
     ports:
-      - "6010:8000"
+      - "6012:8000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
