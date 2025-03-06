@@ -1,6 +1,28 @@
 version: '3.9'
 
 services:
+  postgres-agent:
+    image: postgres:latest
+    env_file:
+      - ../.envs/.dev
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PW}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    container_name:
+      postgres-agent
+    expose:
+      - ${DB_PORT}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    networks:
+      - dev_agent
+    volumes:
+      - /srv/psql:/var/lib/postgresql/data
+    restart: always
+    hostname: postgres-agent
+
   dev-portfolio-tracker:
     build:
       context: ../
