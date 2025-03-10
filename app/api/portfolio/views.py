@@ -1,13 +1,26 @@
 import logging
-from typing import Optional
-
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, Depends
 
 from . import dependencies, schemas
 
 router = APIRouter(tags=["Portfolio"])
 
 logger = logging.getLogger('portfolio/views')
+
+
+@router.get(
+    "/similar_assets",
+    status_code=status.HTTP_200_OK,
+    response_model=list[schemas.SimilarAssetsResponse],
+)
+async def get_similar_assets(
+        result: list[schemas.SimilarAssetsResponse] = Depends(dependencies.get_similar_assets)
+):
+    """
+    Endpoint to get similar assets
+    :return: similar_assets
+    """
+    return result
 
 
 @router.get(
@@ -54,20 +67,5 @@ async def get_selected_portfolio(
     Endpoint to get selected portfolio over user
     :param portfolio_id: portfolio id
     :return: portfolio extended schema
-    """
-    return result
-
-
-@router.get(
-    "/similar_assets",
-    status_code=status.HTTP_200_OK,
-    response_model=list[schemas.SimilarAssetsResponse],
-)
-async def get_similar_assets(
-        result: list[schemas.SimilarAssetsResponse] = Depends(dependencies.get_similar_assets)
-):
-    """
-    Endpoint to get similar assets
-    :return: similar_assets
     """
     return result

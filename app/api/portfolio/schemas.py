@@ -27,6 +27,7 @@ class PortfolioResponseExtended(PortfolioBase):
 
 
 class SimilarAssetsResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     symbol: str
     name: str
     image_url: str
