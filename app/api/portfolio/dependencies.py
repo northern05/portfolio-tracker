@@ -27,7 +27,7 @@ async def connect_tg(
     user = await auth_dependencies.check_wallet(wallet_address=users_data.wallet, session=session)
     user.telegram_id = users_data.telegram_id
     await session.commit()
-    return user
+    return True
 
 
 async def get_all_portfolio(
