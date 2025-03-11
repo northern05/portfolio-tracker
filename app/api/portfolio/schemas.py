@@ -5,7 +5,8 @@ class PortfolioBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     symbol: str
-    period_days: int
+    period_days: int | None = None
+    telegram_id: int
 
 
 class PortfolioCreate(PortfolioBase):

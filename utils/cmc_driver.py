@@ -11,27 +11,29 @@ class CoinMarketCapDriver:
         }
 
     def get_similar_tokens(self, symbol: str):
-        """Fetches tokens similar to the given symbol from CoinMarketCap API."""
-        url = f"{self.BASE_URL}/map"  # Endpoint to fetch all token mappings
-        response = requests.get(url, headers=self.headers)
+        """Fetches the top 10 most popular tokens similar to the given symbol, sorted by market cap."""
+        url = f"{self.BASE_URL}/v1/cryptocurrency/listings/latest"  # Fetches all tokens with market cap data
+        response = requests.get(url, headers=self.headers, params={"limit": 500})  # Fetch top 500 tokens
 
         if response.status_code != 200:
             return {"error": "Failed to fetch data from CoinMarketCap"}
 
         data = response.json().get("data", [])
 
-        # Filter tokens that have the entered symbol as a substring (case-insensitive)
+        # Filter tokens that have the entered symbol in their name or symbol
         similar_tokens = [
             {
                 "name": token["name"],
                 "symbol": token["symbol"],
+                "market_cap": token["quote"]["USD"]["market_cap"],  # Get market cap
                 "image_url": f"https://s2.coinmarketcap.com/static/img/coins/64x64/{token['id']}.png"
-                # CMC image URL pattern
             }
-            for token in data if symbol.lower() in token["symbol"].lower()
+            for token in data if symbol.lower() in token["symbol"].lower() or symbol.lower() in token["name"].lower()
         ]
 
-        return similar_tokens
+        # Sort by market capitalization and return top 10
+        top_similar_tokens = sorted(similar_tokens, key=lambda x: x["market_cap"], reverse=True)[:10]
+        return top_similar_tokens
 
     def get_current_token_price(self, symbol: str):
         """Fetches the current price of a given token by its symbol."""

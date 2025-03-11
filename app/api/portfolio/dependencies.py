@@ -13,10 +13,9 @@ from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver
 
 async def create_portfolio(
         portfolio_data: PortfolioCreate,
-        user: User = Depends(auth_dependencies.check_wallet),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> PortfolioResponse:
-    result = await crud.create(session=session, portfolio_data=portfolio_data, user_id=user.id)
+    result = await crud.create(session=session, portfolio_data=portfolio_data)
     return PortfolioResponse.from_orm(result)
 
 
