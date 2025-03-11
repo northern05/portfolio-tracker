@@ -52,10 +52,6 @@ async def get_selected_portfolio(
         )
     response_data = PortfolioResponseExtended.from_orm(portfolio)
     response_data.current_price = cmc_driver.get_current_token_price(symbol=portfolio.symbol)
-    response_data.sentiment_score = elfa_driver.get_top_posts(
-        symbol=portfolio.symbol,
-        time_window=f"{portfolio.period_days}d"
-    )
     message = f"Tell me last important news about {portfolio.symbol}"
     response_data.related_news = perplexity_driver.chat_without_streaming(message=message)
     return response_data
