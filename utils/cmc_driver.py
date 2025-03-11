@@ -12,8 +12,8 @@ class CoinMarketCapDriver:
 
     def get_similar_tokens(self, symbol: str):
         """Fetches the top 10 most popular tokens similar to the given symbol, sorted by market cap."""
-        url = f"{self.BASE_URL}/v1/cryptocurrency/listings/latest"  # Fetches all tokens with market cap data
-        response = requests.get(url, headers=self.headers, params={"limit": 500})  # Fetch top 500 tokens
+        url = f"{self.BASE_URL}/listings/latest"  # Fetches all tokens with market cap data
+        response = requests.get(url, headers=self.headers, params={"limit": 5000})  # Fetch top 500 tokens
 
         if response.status_code != 200:
             return {"error": "Failed to fetch data from CoinMarketCap"}
