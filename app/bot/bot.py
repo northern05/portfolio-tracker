@@ -5,7 +5,6 @@ from aiogram import Router, F, types, Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from app.core.config import tg_conf
 import re
 
 WALLET_REGEX = {
@@ -19,8 +18,9 @@ WALLET_REGEX = {
     "Cardano (ADA)": r"^addr1[a-z0-9]+$",
 }
 
-TOKEN = tg_conf.TG_TOKEN
-API_URL = tg_conf.BASE_SITE
+TOKEN: str = os.environ.get('TG_TOKEN', "7540334723:AAFGudo28Myy4ltPmZLz3jhODPY4iVrkRG4")
+API_URL: str = os.environ.get('BASE_SITE', "https://api.agent.zpoken.dev/portfolio_tracker/api/v1/portfolio")
+API_KEY: str = os.environ.get('TG_API_KEY', "tg_api_key")
 MAX_BUTTONS_PER_MESSAGE = 10
 
 bot = Bot(token=TOKEN)

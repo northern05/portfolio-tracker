@@ -21,12 +21,6 @@ class DBSettings(BaseSettings):
     db_echo: bool = False
 
 
-class TelegramSettings(BaseSettings):
-    TG_TOKEN: str = os.environ.get('TG_TOKEN', "7540334723:AAFGudo28Myy4ltPmZLz3jhODPY4iVrkRG4")
-    BASE_SITE: str = os.environ.get('BASE_SITE', "https://api.agent.zpoken.dev/portfolio_tracker/api/v1/portfolio")
-    API_KEY: str = os.environ.get('TG_API_KEY', "tg_api_key")
-
-
 class CoinMarketCapSettings(BaseSettings):
     CMC_URL: str = os.environ.get("CMC_URL", "https://pro-api.coinmarketcap.com/v1/cryptocurrency")
     CMC_API_KEY: str = os.environ.get("CMC_API_KEY")
