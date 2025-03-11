@@ -87,7 +87,7 @@ async def get_selected_portfolio(
 
 
 @router.delete(
-    "/{portfolio_id}",
+    "",
     status_code=status.HTTP_202_ACCEPTED
 )
 async def delete_portfolio(
