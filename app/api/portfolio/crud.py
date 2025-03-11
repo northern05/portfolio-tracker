@@ -32,9 +32,17 @@ async def create(session: AsyncSession, portfolio_data: PortfolioCreate) -> Port
         )
         session.add(portfolio)
         await session.commit()
-    portfolio_user = PortfolioUser(portfolio_id=portfolio.id, user_id=user.id)
-    session.add(portfolio_user)
-    await session.commit()
+    portfolio_user_stmt = (
+        select(PortfolioUser)
+        .filter(PortfolioUser.user_id == user.id)
+        .filter(PortfolioUser.portfolio_id == portfolio.id)
+    )
+    result: Result = await session.execute(portfolio_user_stmt)
+    portfolio_user = result.scalars().first()
+    if not portfolio_user:
+        portfolio_user = PortfolioUser(portfolio_id=portfolio.id, user_id=user.id)
+        session.add(portfolio_user)
+        await session.commit()
     return portfolio
 
 
