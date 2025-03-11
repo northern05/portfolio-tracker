@@ -9,8 +9,9 @@ class PortfolioBase(BaseModel):
     telegram_id: int
 
 
-class PortfolioCreate(PortfolioBase):
-    pass
+class PortfolioCreate(BaseModel):
+    telegram_id: int
+    symbol: str
 
 
 class PortfolioUpdate(PortfolioBase):

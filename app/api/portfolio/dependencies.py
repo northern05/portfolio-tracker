@@ -39,7 +39,6 @@ async def get_all_portfolio(
 
 async def get_selected_portfolio(
         portfolio_id: Annotated[int, Path],
-        # user: User = Depends(auth_dependencies.check_wallet),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 
 ) -> PortfolioResponseExtended:

@@ -3,6 +3,7 @@ class PortfolioErrors:
     PORTFOLIO_NOT_FOUND = "Portfolio not found!"
     ASSET_NOT_FOUND = "Asset not found!"
     USER_NOT_OWNER = "That's not your chat!"
+    TELEGRAM_NOT_CONNECTED = "Telegram not connected!"
 
 class LLMErrors:
     CALL_FUNCTION_ERROR = "Call function error!"
@@ -10,7 +11,7 @@ class LLMErrors:
 
 
 class Errors:
-    chats = PortfolioErrors()
+    portfolio_errors = PortfolioErrors()
     llm_errors = LLMErrors()
 
 
