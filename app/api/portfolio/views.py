@@ -71,7 +71,7 @@ async def connect_tg(
 
 
 @router.get(
-    "/{portfolio_id}",
+    "/selected",
     status_code=status.HTTP_200_OK,
     response_model=schemas.PortfolioResponseExtended,
 )

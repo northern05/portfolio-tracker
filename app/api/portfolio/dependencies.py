@@ -38,11 +38,11 @@ async def get_all_portfolio(
 
 
 async def get_selected_portfolio(
-        portfolio_id: Annotated[int, Path],
+        symbol: Annotated[str, Path],
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 
 ) -> PortfolioResponseExtended:
-    portfolio = await crud.get_by_id(session=session, portfolio_id=portfolio_id)
+    portfolio = await crud.get_by_symbol(session=session, symbol=symbol)
     if not portfolio:
         await session.close()
         raise HTTPException(
