@@ -47,6 +47,24 @@ services:
       - postgres-agent
     hostname: dev-portfolio-tracker
 
+  tg-bot-tracker:
+    build:
+      context: ../
+      dockerfile: Dockerfile-telegram
+    env_file:
+      - ../.envs/.dev
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    image:
+      tg-bot-tracker
+    container_name:
+      tg-bot-tracker
+    networks:
+      - dev_agent
+    volumes:
+      - ../:/usr/src/app
+    restart: always
+
 
 networks:
   dev_agent: { }

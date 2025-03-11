@@ -77,3 +77,4 @@ solders==0.23.0
 plotly
 pandas
 kaleido
+aiogram
