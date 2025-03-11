@@ -48,7 +48,7 @@ async def get_selected_portfolio(
         await session.close()
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=errors.projects.PROJECT_NOT_FOUND
+            detail=errors.portfolio_errors.PROJECT_NOT_FOUND
         )
     response_data = PortfolioResponseExtended.from_orm(portfolio)
     response_data.current_price = cmc_driver.get_current_token_price(symbol=portfolio.symbol)
@@ -70,7 +70,7 @@ async def get_selected_portfolio_chart(
         await session.close()
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=errors.projects.PROJECT_NOT_FOUND
+            detail=errors.portfolio_errors.PROJECT_NOT_FOUND
         )
     historical_price = coin_gecko_driver.get_historical_prices(symbol=portfolio.symbol)
     sentiment_score = elfa_driver.get_top_posts(symbol=portfolio.symbol)
