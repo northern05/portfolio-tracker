@@ -7,7 +7,7 @@ from app.core.errors import errors
 from app.core.models import db_helper, User
 from . import crud
 from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, PortfolioResponseExtended, \
-    ConnectTelegram, DeletePortfolio
+    ConnectTelegram
 from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver
 
 

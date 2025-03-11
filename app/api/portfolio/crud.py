@@ -2,7 +2,7 @@ from sqlalchemy import select, func
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .schemas import PortfolioCreate, PortfolioUpdate, PortfolioResponse, DeletePortfolio
+from .schemas import PortfolioCreate, PortfolioUpdate, PortfolioResponse
 from app.core.models import Portfolio, PortfolioUser, User
 
 
