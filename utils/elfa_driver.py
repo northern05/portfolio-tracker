@@ -6,7 +6,7 @@ class ElfaDriver:
         self.ELFA_URL = base_url
         self.ELFA_API_KEY = api_key
 
-    def get_top_posts(self, symbol: str, time_window: str = "1d", page: int = 1,
+    def get_top_posts(self, symbol: str, time_window: str = "7d", page: int = 1,
                       page_size: int = 10):
         url = f'{self.ELFA_URL}/top-mentions?ticker={symbol}&timeWindow={time_window}&page={page}&pageSize={page_size}'
         headers = {

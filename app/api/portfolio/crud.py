@@ -59,7 +59,7 @@ async def get_by_id(session: AsyncSession, portfolio_id: int) -> Portfolio | Non
 async def get_by_symbol(session: AsyncSession, symbol: str) -> Portfolio | None:
     stmt = (
         select(Portfolio)
-        .filter(Portfolio.symbol == symbol)
+        .filter(func.lower(Portfolio.symbol) == symbol.lower())
     )
     result: Result = await session.execute(stmt)
     portfolio = result.scalars().first()

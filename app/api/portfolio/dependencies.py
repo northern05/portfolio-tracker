@@ -8,7 +8,8 @@ from app.core.models import db_helper, User
 from . import crud
 from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, PortfolioResponseExtended, \
     ConnectTelegram
-from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver
+from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver
+from utils.general import create_crypto_sentiment_chart
 
 
 async def create_portfolio(
@@ -58,6 +59,23 @@ async def get_selected_portfolio(
     message = f"Tell me last important news about {portfolio.symbol}"
     response_data.related_news = perplexity_driver.chat_without_streaming(message=message)
     return response_data
+
+
+async def get_selected_portfolio_chart(
+        symbol: Annotated[str, Path],
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+) -> PortfolioResponseExtended:
+    portfolio = await crud.get_by_symbol(session=session, symbol=symbol)
+    if not portfolio:
+        await session.close()
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=errors.projects.PROJECT_NOT_FOUND
+        )
+    historical_price = coin_gecko_driver.get_historical_prices(symbol=portfolio.symbol)
+    sentiment_score = elfa_driver.get_top_posts(symbol=portfolio.symbol)
+    response_data = create_crypto_sentiment_chart(historical_prices=historical_price, sentiment_data=sentiment_score)
+    return response_data.getvalue()
 
 
 async def get_similar_assets(

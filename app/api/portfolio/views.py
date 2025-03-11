@@ -1,5 +1,5 @@
 import logging
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, Response
 
 from . import dependencies, schemas
 
@@ -84,6 +84,21 @@ async def get_selected_portfolio(
     :return: portfolio extended schema
     """
     return result
+
+@router.get(
+    "/selected/chart",
+    status_code=status.HTTP_200_OK,
+    response_model=schemas.PortfolioResponseExtended,
+)
+async def get_selected_portfolio_chart(
+        image_bytes: bytes = Depends(dependencies.get_selected_portfolio_chart)
+):
+    """
+    Endpoint to get selected portfolio over user
+    :param portfolio_id: portfolio id
+    :return: portfolio extended schema
+    """
+    return Response(content=image_bytes, media_type="image/png")
 
 
 @router.delete(
