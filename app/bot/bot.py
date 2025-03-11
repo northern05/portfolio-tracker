@@ -5,7 +5,7 @@ from aiogram import Router, F, types, Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from app.core.config import redis_config, tg_conf
+from app.core.config import tg_conf
 import re
 
 WALLET_REGEX = {
@@ -21,7 +21,6 @@ WALLET_REGEX = {
 
 TOKEN = tg_conf.TG_TOKEN
 API_URL = tg_conf.BASE_SITE
-REDIS_URL = redis_config.REDIS_URL
 MAX_BUTTONS_PER_MESSAGE = 10
 
 bot = Bot(token=TOKEN)
