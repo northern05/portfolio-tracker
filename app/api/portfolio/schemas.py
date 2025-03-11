@@ -6,7 +6,7 @@ class PortfolioBase(BaseModel):
 
     symbol: str
     period_days: int | None = None
-    telegram_id: int
+    telegram_id: int | None = None
 
 
 class PortfolioCreate(BaseModel):

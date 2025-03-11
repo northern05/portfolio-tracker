@@ -10,4 +10,4 @@ class Portfolio(Base):
     period_days: Mapped[int] = mapped_column(Integer, nullable=False)
 
     def __repr__(self):
-        return f"<Portfolio for user {self.user_id}, by asset {self.symbol}, with period {self.period}>"
+        return f"<Portfolio by asset {self.symbol}, with period {self.period_days}>"
