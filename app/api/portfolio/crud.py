@@ -101,3 +101,4 @@ async def delete_users_portfolio(
     portfolio = result.scalars().first()
     await session.delete(portfolio)
     await session.commit()
+    return True

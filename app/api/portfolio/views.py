@@ -97,3 +97,4 @@ async def delete_portfolio(
     Endpoint to get selected portfolio over user
     :return: portfolio extended schema
     """
+    return result

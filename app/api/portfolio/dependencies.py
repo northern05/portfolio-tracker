@@ -71,4 +71,5 @@ async def delete_portfolio(
         delete_data: DeletePortfolio,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    await crud.delete_users_portfolio(session=session, delete_data=delete_data)
+    result = await crud.delete_users_portfolio(session=session, delete_data=delete_data)
+    return result
