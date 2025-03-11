@@ -33,11 +33,6 @@ class ConnectTelegram(BaseModel):
     wallet: str
 
 
-class DeletePortfolio(BaseModel):
-    telegram_id: int
-    symbol: str
-
-
 class SimilarAssetsResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     symbol: str

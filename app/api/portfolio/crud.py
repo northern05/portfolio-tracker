@@ -88,14 +88,15 @@ async def delete_project(
 
 async def delete_users_portfolio(
         session: AsyncSession,
-        delete_data: DeletePortfolio
+        symbol: str,
+        telegram_id: int
 ):
     stmt = (
         select(PortfolioUser)
         .join(User, User.id == PortfolioUser.user_id)
         .join(Portfolio, Portfolio.id == PortfolioUser.portfolio_id)
-        .filter(User.telegram_id == delete_data.telegram_id)
-        .filter(func.lower(Portfolio.symbol) == delete_data.symbol.lower())
+        .filter(User.telegram_id == telegram_id)
+        .filter(func.lower(Portfolio.symbol) == symbol.lower())
     )
     result: Result = await session.execute(stmt)
     portfolio = result.scalars().first()

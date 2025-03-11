@@ -68,8 +68,9 @@ async def get_similar_assets(
 
 
 async def delete_portfolio(
-        delete_data: DeletePortfolio,
+        telegram_id: int,
+        symbol: str,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    result = await crud.delete_users_portfolio(session=session, delete_data=delete_data)
+    result = await crud.delete_users_portfolio(session=session, telegram_id=telegram_id, symbol=symbol)
     return result
