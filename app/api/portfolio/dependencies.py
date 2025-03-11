@@ -30,7 +30,7 @@ async def connect_tg(
 
 
 async def get_all_portfolio(
-        user: User = Depends(auth_dependencies.check_wallet),
+        user: User = Depends(auth_dependencies.check_telegram_id),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> list[PortfolioResponse]:
     res = await crud.get_users_assets(session=session, user_id=user.id)
