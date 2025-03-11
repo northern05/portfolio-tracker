@@ -22,7 +22,6 @@ async def create_portfolio(
 
 async def connect_tg(
         users_data: ConnectTelegram,
-        api_key: str = Depends(auth_dependencies.check_api_key),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency)
 ):
     user = await auth_dependencies.check_wallet(wallet_address=users_data.wallet, session=session)
@@ -68,3 +67,10 @@ async def get_similar_assets(
 ) -> list[SimilarAssetsResponse]:
     similar_assets = cmc_driver.get_similar_tokens(symbol=asset_symbol)
     return [SimilarAssetsResponse.from_orm(asset) for asset in similar_assets]
+
+
+async def delete_portfolio(
+        delete_data: DeletePortfolio,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    await crud.delete_users_portfolio(session=session, delete_data=delete_data)
