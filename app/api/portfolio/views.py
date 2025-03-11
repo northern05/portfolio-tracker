@@ -69,3 +69,16 @@ async def get_selected_portfolio(
     :return: portfolio extended schema
     """
     return result
+
+
+@router.delete(
+    "/{portfolio_id}",
+    status_code=status.HTTP_202_ACCEPTED
+)
+async def delete_portfolio(
+        result: schemas.PortfolioResponseExtended = Depends(dependencies.delete_portfolio)
+):
+    """
+    Endpoint to get selected portfolio over user
+    :return: portfolio extended schema
+    """

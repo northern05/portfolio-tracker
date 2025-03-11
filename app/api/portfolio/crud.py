@@ -1,9 +1,9 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .schemas import PortfolioCreate, PortfolioUpdate, PortfolioResponse
-from app.core.models import Portfolio, PortfolioUser
+from .schemas import PortfolioCreate, PortfolioUpdate, PortfolioResponse, DeletePortfolio
+from app.core.models import Portfolio, PortfolioUser, User
 
 
 async def get_users_assets(session: AsyncSession, user_id: int) -> list | None:
@@ -41,6 +41,7 @@ async def get_by_id(session: AsyncSession, portfolio_id: int) -> Portfolio | Non
     portfolio = result.scalars().first()
     return portfolio
 
+
 async def get_by_symbol(session: AsyncSession, symbol: str) -> Portfolio | None:
     stmt = (
         select(Portfolio)
@@ -67,5 +68,22 @@ async def delete_project(
         session: AsyncSession,
         portfolio: Portfolio,
 ) -> None:
+    await session.delete(portfolio)
+    await session.commit()
+
+
+async def delete_users_portfolio(
+        session: AsyncSession,
+        delete_data: DeletePortfolio
+):
+    stmt = (
+        select(PortfolioUser)
+        .join(User, User.id == PortfolioUser.user_id)
+        .join(Portfolio, Portfolio.id == PortfolioUser.portfolio_id)
+        .filter(User.telegram_id == delete_data.telegram_id)
+        .filter(func.lower(Portfolio.symbol) == delete_data.symbol.lower())
+    )
+    result: Result = await session.execute(stmt)
+    portfolio = result.scalars().first()
     await session.delete(portfolio)
     await session.commit()

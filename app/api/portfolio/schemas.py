@@ -26,6 +26,16 @@ class PortfolioResponseExtended(PortfolioBase):
     current_price: float | None = None
 
 
+class ConnectTelegram(BaseModel):
+    telegram_id: int
+    wallet: str
+
+
+class DeletePortfolio(BaseModel):
+    telegram_id: int
+    symbol: str
+
+
 class SimilarAssetsResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     symbol: str

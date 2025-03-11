@@ -6,7 +6,8 @@ from app.api.auth import dependencies as auth_dependencies
 from app.core.errors import errors
 from app.core.models import db_helper, User
 from . import crud
-from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, PortfolioResponseExtended
+from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, PortfolioResponseExtended, \
+    ConnectTelegram, DeletePortfolio
 from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver
 
 
@@ -17,6 +18,17 @@ async def create_portfolio(
 ) -> PortfolioResponse:
     result = await crud.create(session=session, portfolio_data=portfolio_data, user_id=user.id)
     return PortfolioResponse.from_orm(result)
+
+
+async def connect_tg(
+        users_data: ConnectTelegram,
+        api_key: str = Depends(auth_dependencies.check_api_key),
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+):
+    user = await auth_dependencies.check_wallet(wallet_address=users_data.wallet, session=session)
+    user.telegram_id = users_data.telegram_id
+    await session.commit()
+    return user
 
 
 async def get_all_portfolio(

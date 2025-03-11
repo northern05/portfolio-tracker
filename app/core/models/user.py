@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import func, String
+from sqlalchemy import func, String, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -11,6 +11,7 @@ class User(Base):
 
     wallet: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
     twitter_id: Mapped[str] = mapped_column(String(128), nullable=True, server_default="null")
+    telegram_id: Mapped[int] = mapped_column(Integer, nullable=True)
     restricted_until: Mapped[datetime.datetime] = mapped_column(nullable=True)
 
     def __repr__(self):
