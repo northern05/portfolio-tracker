@@ -55,6 +55,21 @@ async def create_portfolio(
     return result
 
 
+@router.post(
+    "/connect_telegram",
+    status_code=status.HTTP_200_OK,
+    response_model=schemas.PortfolioResponse,
+)
+async def connect_tg(
+        result: schemas.PortfolioResponse = Depends(dependencies.connect_tg)
+):
+    """
+    Endpoint to get portfolio over user
+    :return: list portfolio
+    """
+    return result
+
+
 @router.get(
     "/{portfolio_id}",
     status_code=status.HTTP_200_OK,
