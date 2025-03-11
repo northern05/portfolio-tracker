@@ -28,7 +28,7 @@ async def create(session: AsyncSession, portfolio_data: PortfolioCreate) -> Port
     portfolio = await get_by_symbol(session=session, symbol=portfolio_data.symbol)
     if not portfolio:
         portfolio = Portfolio(
-            **portfolio_data.model_dump(),
+            **portfolio_data.model_dump(exclude={"telegram_id"}),
         )
         session.add(portfolio)
         await session.commit()
