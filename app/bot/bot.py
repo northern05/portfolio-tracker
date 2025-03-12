@@ -58,7 +58,7 @@ async def set_bot_commands(bot: Bot):
         types.BotCommand(command="start", description="Start the bot"),
         types.BotCommand(command="add_wallet", description="Add your crypto wallet"),
         types.BotCommand(command="my_portfolio", description="View your portfolio"),
-        types.BotCommand(command="get_report", description="Get a 7-day report for a coin"),
+        types.BotCommand(command="get_report_menu", description="Get a 7-day report for a coin"),
         types.BotCommand(command="help", description="Show help menu")
     ]
     await bot.set_my_commands(commands)
@@ -84,7 +84,7 @@ async def handle_command_callback(callback: types.CallbackQuery):
         "cmd_start": "/start - Start the bot",
         "cmd_add_wallet": "/add_wallet - Add your crypto wallet",
         "cmd_my_portfolio": "/my_portfolio - View your portfolio",
-        "cmd_get_report": "/get_report - Get a 7-day report for a coin",
+        "cmd_get_report": "/get_report_menu - Get a 7-day report for a coin",
         "cmd_help": "/help - Show help message"
     }
     command = command_map.get(callback.data)
