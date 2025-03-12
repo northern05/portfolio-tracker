@@ -27,6 +27,8 @@ MAX_BUTTONS_PER_MESSAGE = 10
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+self_id = 7540334723
+
 
 def validate_wallet(address: str):
     for blockchain, pattern in WALLET_REGEX.items():
@@ -154,7 +156,8 @@ async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
 
 @tg_router.message(Command("my_portfolio"))
 async def edit_portfolio_menu(message: types.Message):
-    response = requests.get(f"{API_URL}", params={"telegram_id": message.from_user.id})
+    telegram_id = message.from_user.id if message.from_user.id != self_id else message.chat.id
+    response = requests.get(f"{API_URL}", params={"telegram_id": telegram_id})
 
     if response.status_code == 200:
         data = response.json()
