@@ -52,8 +52,11 @@ async def get_selected_portfolio(
         )
     response_data = PortfolioResponseExtended.from_orm(portfolio)
     response_data.current_price = cmc_driver.get_current_token_price(symbol=portfolio.symbol)
-    message = f"Tell me last important news about {portfolio.symbol}"
-    response_data.related_news = perplexity_driver.chat_without_streaming(message=message)
+    full_token_name = coin_gecko_driver.get_token_name(symbol=portfolio.symbol)
+    response_data.related_news = perplexity_driver.chat_without_streaming(
+        symbol=portfolio.symbol,
+        full_token_name=full_token_name
+    )
     return response_data
 
 

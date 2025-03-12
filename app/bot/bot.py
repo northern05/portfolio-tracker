@@ -162,22 +162,78 @@ async def edit_portfolio_menu(message: types.Message):
 
         if not coins:
             await message.answer(
-                "Your portfolio is empty, you can add wallet with **/add_wallet**, and then add coins with **/add_coin**.", parse_mode='Markdown')
+                "Your portfolio is empty, you can add wallet with **/add_wallet**, and then add coins with **/add_coin**.",
+                parse_mode='Markdown')
             return
 
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
-                                [InlineKeyboardButton(text=f"➖ Delete {coin}", callback_data=f"remove_{coin}")]
-                                for coin in coins
-                            ] + [[InlineKeyboardButton(text="➕ Add coin", callback_data="add_coin")]] + [
-                                [InlineKeyboardButton(text=f"➕ Get report {coin}", callback_data=f"get_report_{coin}")]
-                                for coin
-                                in coins]
+                [InlineKeyboardButton(text="➖ Delete", callback_data="delete_menu"),
+                 InlineKeyboardButton(text="➕ Add coin", callback_data="add_coin")],  # First row with two buttons
+                [InlineKeyboardButton(text="📊 Get report", callback_data="get_report_menu")]
+                # Second row with one button
+            ]
         )
 
         await message.answer("Your portfolio:", reply_markup=keyboard)
     else:
         await message.answer("Error portfolio getting.")
+
+
+@tg_router.callback_query(F.data == "delete_menu")
+async def show_delete_menu(callback: types.CallbackQuery):
+    response = requests.get(f"{API_URL}", params={"telegram_id": callback.from_user.id})
+
+    if response.status_code == 200:
+        data = response.json()
+        coins = [coin.get("symbol") for coin in data]
+
+        if not coins:
+            await callback.message.answer("Your portfolio is empty.")
+            return
+
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                                [InlineKeyboardButton(text=coin, callback_data=f"remove_{coin}")] for coin in coins
+                            ] + [[InlineKeyboardButton(text="⬅️ Back", callback_data="cancel_delete")]]
+        )
+
+        await callback.message.answer("Select a coin to delete:", reply_markup=keyboard)
+    else:
+        await callback.message.answer("Error retrieving portfolio.")
+
+
+@tg_router.callback_query(F.data == "get_report_menu")
+async def show_get_report_menu(callback: types.CallbackQuery):
+    response = requests.get(f"{API_URL}", params={"telegram_id": callback.from_user.id})
+
+    if response.status_code == 200:
+        data = response.json()
+        coins = [coin.get("symbol") for coin in data]
+
+        if not coins:
+            await callback.message.answer("Your portfolio is empty.")
+            return
+
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                                [InlineKeyboardButton(text=coin, callback_data=f"get_report_{coin}")] for coin in coins
+                            ] + [[InlineKeyboardButton(text="⬅️ Back", callback_data="cancel_report")]]
+        )
+
+        await callback.message.answer("Select a coin to delete:", reply_markup=keyboard)
+    else:
+        await callback.message.answer("Error retrieving portfolio.")
+
+
+@tg_router.callback_query(F.data == "cancel_delete")
+async def cancel_delete(callback: types.CallbackQuery):
+    await edit_portfolio_menu(callback.message)
+
+
+@tg_router.callback_query(F.data == "cancel_report")
+async def cancel_report(callback: types.CallbackQuery):
+    await edit_portfolio_menu(callback.message)
 
 
 @tg_router.callback_query(F.data.startswith("remove_"))
@@ -187,7 +243,7 @@ async def remove_coin(callback: types.CallbackQuery):
 
     if response.status_code == 202:
         await callback.answer(f"✅ Coin **{coin}** removed!", parse_mode='Markdown')
-        await edit_portfolio_menu(callback.message)  # Оновити меню
+        await edit_portfolio_menu(callback.message)
     else:
         await callback.answer("❌ Error removing coin. Please try again.")
 

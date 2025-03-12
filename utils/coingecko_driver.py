@@ -50,6 +50,22 @@ class CryptoPriceFetcher:
 
         return coin["id"] if coin else None
 
+    def get_token_name(self, symbol: str):
+        """Fetches the full token name from CoinGecko by its symbol."""
+        url = f"{self.BASE_URL}/api/v3/coins/list"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            token = next((coin for coin in data if coin["symbol"].lower() == symbol.lower()), None)
+
+            if token:
+                return token["name"]
+            else:
+                return f"Token '{symbol}' not found."
+        else:
+            return "Error fetching data from CoinGecko."
+
 
 if __name__ == '__main__':
     # Example usage
