@@ -8,6 +8,14 @@ class Config(BaseSettings):
     APP_DOMAIN: str = "api.agent.zpoken.dev"
 
 
+class RedisSettings(BaseSettings):
+    REDIS_HOST: str = os.environ.get('REDIS_HOST')
+    REDIS_PORT: str = os.environ.get('REDIS_PORT')
+    REDIS_USER: str = os.environ.get('REDIS_USER')
+    REDIS_PASSWORD: str = os.environ.get('REDIS_PASSWORD')
+    REDIS_URL: str = f"redis://{REDIS_USER}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}"
+
+
 class DBSettings(BaseSettings):
     DB_NAME: str = os.environ.get("DB_NAME")
     DB_USER: str = os.environ.get("DB_USER")
@@ -41,3 +49,4 @@ db_config = DBSettings()
 cmc_config = CoinMarketCapSettings()
 elfa_config = ElfaSettings()
 perplexity_config = PerplexitySettings()
+redis_config = RedisSettings()
