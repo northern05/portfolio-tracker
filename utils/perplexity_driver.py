@@ -17,6 +17,7 @@ class PerplexityDriver:
             4. Investment Landscape
                 1. News and Link
         2. News Data: Output from 1st Prompt
+        highlight text headings according to telegram's markdown
         """
         prompt = f"""
         retrieve news about the crypto asset "${symbol}" or "{full_token_name}" focusing on events that occurred between 03.03.2025 and 11.03.2025. 
