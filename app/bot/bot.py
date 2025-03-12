@@ -1,5 +1,7 @@
 import logging
 import os
+from typing import Union
+
 import requests
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from aiogram import Router, F, types, Bot, Dispatcher
@@ -109,7 +111,7 @@ async def save_wallet(message: types.Message, state: FSMContext):
     result, msg = validate_wallet(address=wallet)
     if result:
         response = requests.post(f"{API_URL}/connect_telegram",
-                                 json={"telegram_id": message.from_user.id, "wallet": wallet})
+                                 json={"telegram_id": str(message.from_user.id), "wallet": wallet})
         if response.status_code == 200:
             await state.set_state(PortfolioState.choosing_coin)
             await message.answer(
@@ -145,7 +147,7 @@ async def process_token(message: types.Message, state: FSMContext):
 @tg_router.message(PortfolioState.enter_coin)
 async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
     coin = message.text.upper().split()[0]
-    response = requests.post(f"{API_URL}", json={"telegram_id": message.from_user.id, "symbol": coin})
+    response = requests.post(f"{API_URL}", json={"telegram_id": str(message.from_user.id), "symbol": coin})
 
     if response.status_code == 200:
         await state.clear()
@@ -157,7 +159,7 @@ async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
 @tg_router.message(Command("my_portfolio"))
 async def edit_portfolio_menu(message: types.Message):
     telegram_id = message.from_user.id if message.from_user.id != self_id else message.chat.id
-    response = requests.get(f"{API_URL}", params={"telegram_id": telegram_id})
+    response = requests.get(f"{API_URL}", params={"telegram_id": str(telegram_id)})
 
     if response.status_code == 200:
         data = response.json()
@@ -185,7 +187,7 @@ async def edit_portfolio_menu(message: types.Message):
 
 @tg_router.callback_query(F.data == "delete_menu")
 async def show_delete_menu(callback: types.CallbackQuery):
-    response = requests.get(f"{API_URL}", params={"telegram_id": callback.from_user.id})
+    response = requests.get(f"{API_URL}", params={"telegram_id": str(callback.from_user.id)})
 
     if response.status_code == 200:
         data = response.json()
@@ -206,16 +208,21 @@ async def show_delete_menu(callback: types.CallbackQuery):
         await callback.message.answer("Error retrieving portfolio.")
 
 
+@tg_router.message(Command("get_report_menu"))
 @tg_router.callback_query(F.data == "get_report_menu")
-async def show_get_report_menu(callback: types.CallbackQuery):
-    response = requests.get(f"{API_URL}", params={"telegram_id": callback.from_user.id})
+async def show_get_report_menu(event: Union[types.Message, types.CallbackQuery]):
+    user_id = event.from_user.id  # Works for both Message & CallbackQuery
+
+    response = requests.get(f"{API_URL}", params={"telegram_id": str(user_id)})
 
     if response.status_code == 200:
         data = response.json()
         coins = [coin.get("symbol") for coin in data]
 
         if not coins:
-            await callback.message.answer("Your portfolio is empty.")
+            await event.answer("Your portfolio is empty.") if isinstance(event,
+                                                                         types.CallbackQuery) else await event.message.answer(
+                "Your portfolio is empty.")
             return
 
         keyboard = InlineKeyboardMarkup(
@@ -224,9 +231,16 @@ async def show_get_report_menu(callback: types.CallbackQuery):
                             ] + [[InlineKeyboardButton(text="⬅️ Back", callback_data="cancel_report")]]
         )
 
-        await callback.message.answer("Select a coin to delete:", reply_markup=keyboard)
+        if isinstance(event, types.CallbackQuery):
+            await event.message.answer("Select a coin to generate a report:", reply_markup=keyboard)
+            await event.answer()  # Acknowledge button press
+        else:
+            await event.answer("Select a coin to generate a report:", reply_markup=keyboard)
+
     else:
-        await callback.message.answer("Error retrieving portfolio.")
+        await event.answer("Error retrieving portfolio.") if isinstance(event,
+                                                                        types.CallbackQuery) else await event.message.answer(
+            "Error retrieving portfolio.")
 
 
 @tg_router.callback_query(F.data == "cancel_delete")
@@ -242,7 +256,7 @@ async def cancel_report(callback: types.CallbackQuery):
 @tg_router.callback_query(F.data.startswith("remove_"))
 async def remove_coin(callback: types.CallbackQuery):
     coin = callback.data.split("_")[1]
-    response = requests.delete(f"{API_URL}", params={"telegram_id": callback.from_user.id, "symbol": coin})
+    response = requests.delete(f"{API_URL}", params={"telegram_id": str(callback.from_user.id), "symbol": coin})
 
     if response.status_code == 202:
         await callback.answer(f"✅ Coin **{coin}** removed!", parse_mode='Markdown')
