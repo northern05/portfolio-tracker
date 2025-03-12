@@ -293,6 +293,7 @@ async def get_report(callback: types.CallbackQuery):
         await callback.message.answer(f"📰 **News:**\n{news}", parse_mode='Markdown')
         await callback.message.answer(f"💰 **Current price:** {price} USD", parse_mode='Markdown')
         await callback.message.answer("Maybe I can help you more?")
+        await edit_portfolio_menu(callback.message)
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
 
