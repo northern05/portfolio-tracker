@@ -6,11 +6,11 @@ class PortfolioBase(BaseModel):
 
     symbol: str
     period_days: int | None = None
-    telegram_id: int | None = None
+    telegram_id: str | None = None
 
 
 class PortfolioCreate(BaseModel):
-    telegram_id: int
+    telegram_id: str
     symbol: str
 
 
@@ -28,7 +28,7 @@ class PortfolioResponseExtended(PortfolioBase):
 
 
 class ConnectTelegram(BaseModel):
-    telegram_id: int
+    telegram_id: str
     wallet: str
 
 

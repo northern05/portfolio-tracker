@@ -23,7 +23,7 @@ async def check_wallet(
 
 
 async def check_telegram_id(
-        telegram_id: int,
+        telegram_id: str,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> User:
     user = await crud.select_by_telegram_id(session=session, telegram_id=telegram_id)

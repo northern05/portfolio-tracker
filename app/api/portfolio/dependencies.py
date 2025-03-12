@@ -85,7 +85,7 @@ async def get_similar_assets(
 
 
 async def delete_portfolio(
-        telegram_id: int,
+        telegram_id: str,
         symbol: str,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):

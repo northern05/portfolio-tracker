@@ -89,7 +89,7 @@ async def delete_project(
 async def delete_users_portfolio(
         session: AsyncSession,
         symbol: str,
-        telegram_id: int
+        telegram_id: str
 ):
     stmt = (
         select(PortfolioUser)
