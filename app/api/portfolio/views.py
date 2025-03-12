@@ -88,7 +88,7 @@ async def get_selected_portfolio(
 @router.get(
     "/selected/chart",
     status_code=status.HTTP_200_OK,
-    response_model=schemas.PortfolioResponseExtended,
+    response_model=bytes,
 )
 async def get_selected_portfolio_chart(
         image_bytes: bytes = Depends(dependencies.get_selected_portfolio_chart)

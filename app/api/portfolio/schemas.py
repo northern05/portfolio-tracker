@@ -23,8 +23,8 @@ class PortfolioResponse(PortfolioBase):
 
 
 class PortfolioResponseExtended(PortfolioBase):
-    related_news: list | None = None
-    current_price: float | None = None
+    related_news: str | None = None
+    current_price: dict | None = None
 
 
 class ConnectTelegram(BaseModel):

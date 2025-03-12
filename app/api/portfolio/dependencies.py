@@ -1,3 +1,5 @@
+import io
+import json
 from typing import Annotated
 from fastapi import Path, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +12,7 @@ from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, 
     ConnectTelegram
 from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver
 from utils.general import create_crypto_sentiment_chart
+from  app.core.modules_factory import redis_db
 
 
 async def create_portfolio(
@@ -44,6 +47,9 @@ async def get_selected_portfolio(
 
 ) -> PortfolioResponseExtended:
     portfolio = await crud.get_by_symbol(session=session, symbol=symbol)
+    cash_data = await redis_db.get(portfolio.symbol)
+    if cash_data:
+        return PortfolioResponseExtended.parse_obj(json.loads(cash_data.decode("UTF-8")))
     if not portfolio:
         await session.close()
         raise HTTPException(
@@ -57,14 +63,18 @@ async def get_selected_portfolio(
         symbol=portfolio.symbol,
         full_token_name=full_token_name
     )
+    await redis_db.set(portfolio.symbol, response_data.json(), ex=86400)
     return response_data
 
 
 async def get_selected_portfolio_chart(
         symbol: Annotated[str, Path],
         session: AsyncSession = Depends(db_helper.scoped_session_dependency)
-) -> PortfolioResponseExtended:
+) -> bytes:
     portfolio = await crud.get_by_symbol(session=session, symbol=symbol)
+    cash_data = await redis_db.get(f"{portfolio.symbol}_graph")
+    if cash_data:
+        return cash_data
     if not portfolio:
         await session.close()
         raise HTTPException(
@@ -74,6 +84,7 @@ async def get_selected_portfolio_chart(
     historical_price = coin_gecko_driver.get_historical_prices(symbol=portfolio.symbol)
     sentiment_score = elfa_driver.get_top_posts(symbol=portfolio.symbol)
     response_data = create_crypto_sentiment_chart(historical_prices=historical_price, sentiment_data=sentiment_score)
+    await redis_db.set(f"{portfolio.symbol}_graph", response_data.getvalue(), ex=86400)
     return response_data.getvalue()
 
 
