@@ -32,6 +32,12 @@ dp = Dispatcher()
 self_id = 7540334723
 
 
+def get_similar_tokens(symbol: str):
+    result = requests.get(f"{API_URL}/similar_assets", params={"asset_symbol": symbol})
+    similar_tokens = [symbol.get("symbol") for symbol in result.json()]
+    return similar_tokens
+
+
 def validate_wallet(address: str):
     for blockchain, pattern in WALLET_REGEX.items():
         if re.match(pattern, address):
@@ -127,11 +133,9 @@ async def save_wallet(message: types.Message, state: FSMContext):
 @tg_router.message(PortfolioState.choosing_coin)
 async def process_token(message: types.Message, state: FSMContext):
     symbol = message.text.upper()
-    result = requests.get(f"{API_URL}/similar_assets", params={"asset_symbol": symbol})
-    similar_tokens = [symbol.get("symbol") for symbol in result.json()]
-
+    similar_tokens = get_similar_tokens(symbol=symbol)
     if not similar_tokens:
-        await message.answer("Не знайдено схожих активів. Введіть інший символ:")
+        await message.answer("No similar assets found. Please enter a different character:")
         return
 
     keyboard = types.ReplyKeyboardMarkup(
@@ -146,12 +150,16 @@ async def process_token(message: types.Message, state: FSMContext):
 
 @tg_router.message(PortfolioState.enter_coin)
 async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
-    coin = message.text.upper().split()[0]
-    response = requests.post(f"{API_URL}", json={"telegram_id": str(message.from_user.id), "symbol": coin})
+    symbol = message.text.upper()
+    similar_tokens = get_similar_tokens(symbol=symbol)
+    if symbol not in similar_tokens:
+        await message.answer("No similar assets found. Please enter a different character:")
+        return
+    response = requests.post(f"{API_URL}", json={"telegram_id": str(message.from_user.id), "symbol": symbol})
 
     if response.status_code == 200:
         await state.clear()
-        await message.answer(f"Coin {coin} added to your portfolio! 🎉")
+        await message.answer(f"Coin {symbol} added to your portfolio! 🎉")
     else:
         await message.answer("Failed. Try later.")
 
@@ -174,9 +182,10 @@ async def edit_portfolio_menu(message: types.Message):
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text="➖ Delete", callback_data="delete_menu"),
-                 InlineKeyboardButton(text="➕ Add coin", callback_data="add_coin")],  # First row with two buttons
-                [InlineKeyboardButton(text="📊 Get report", callback_data="get_report_menu")]
-                # Second row with one button
+                 InlineKeyboardButton(text="➕ Add coin", callback_data="add_coin")],
+                [InlineKeyboardButton(text="📊 Get report", callback_data="get_report_menu")],
+                [InlineKeyboardButton(text="📊 Get total report", callback_data="get_total_report")]
+
             ]
         )
 
@@ -310,6 +319,51 @@ async def get_report(callback: types.CallbackQuery):
         await edit_portfolio_menu(callback.message)
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
+
+
+@tg_router.callback_query(F.data.startswith("get_total_report"))
+async def get_report(callback: types.CallbackQuery):
+    user_id = callback.from_user.id  # Works for both Message & CallbackQuery
+    response = requests.get(f"{API_URL}", params={"telegram_id": str(user_id)})
+    coins = []
+
+    if response.status_code == 200:
+        data = response.json()
+        coins = [coin.get("symbol") for coin in data]
+    for coin in coins:
+        # ✅ Immediately acknowledge the callback query to prevent timeout
+        await callback.answer(f"📊 Generating report for {coin}, please wait...", show_alert=False)
+        # Fetch chart image
+        response = requests.get(f"{API_URL}/selected/chart", params={"symbol": coin})
+        if response.status_code == 200:
+            image_path = "chart.png"
+            with open(image_path, "wb") as f:
+                f.write(response.content)
+
+            # ✅ Send the chart image
+            await bot.send_photo(chat_id=callback.from_user.id, photo=FSInputFile(image_path),
+                                 caption=f"📊 **Crypto Price** vs **Sentiment Analysis** for {coin}", parse_mode='Markdown')
+
+            # Remove image after sending
+            os.remove(image_path)
+        else:
+            await callback.message.answer("❌ Failed to generate the chart. Try again later.")
+            return
+
+        # Fetch additional data (News & Price)
+        response = requests.get(f"{API_URL}/selected", params={"telegram_id": str(callback.from_user.id), "symbol": coin})
+        if response.status_code == 200:
+            data = response.json()
+            news = data.get("related_news", "No news available.")
+            price = data.get("current_price", {}).get("price_usd", "N/A")
+
+            # ✅ Send news & price separately
+            await callback.message.answer(f"📰 **News by {coin}:**\n{news}", parse_mode='Markdown')
+            await callback.message.answer(f"💰 **Current price of {coin}:** {price} USD", parse_mode='Markdown')
+        else:
+            await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
+    await callback.message.answer("Maybe I can help you more?")
+    await edit_portfolio_menu(callback.message)
 
 
 # @tg_router.message(F.text)

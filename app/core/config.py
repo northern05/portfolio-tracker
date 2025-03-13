@@ -41,7 +41,15 @@ class ElfaSettings(BaseSettings):
 
 class PerplexitySettings(BaseSettings):
     PERPLEXITY_URL: str = os.environ.get("PERPLEXITY_URL", "https://api.perplexity.ai")
-    PERPLEXITY_API_KEY: str = os.environ.get("ELFA_API_KEY")
+    PERPLEXITY_API_KEY: str = os.environ.get("PERPLEXITY_API_KEY")
+
+
+class OpenAISettings(BaseSettings):
+    OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY")
+
+class GrokSettings(BaseSettings):
+    GROK_URL: str = os.environ.get("GROK_URL", "https://api.grok.x.ai/v1")
+    GROK_API_KEY: str = os.environ.get("GROK_API_KEY", "")
 
 
 config = Config()
@@ -50,3 +58,5 @@ cmc_config = CoinMarketCapSettings()
 elfa_config = ElfaSettings()
 perplexity_config = PerplexitySettings()
 redis_config = RedisSettings()
+openai_config = OpenAISettings()
+grok_config = GrokSettings()

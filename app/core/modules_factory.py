@@ -1,9 +1,10 @@
 from redis.asyncio import Redis
-from app.core.config import config, cmc_config, perplexity_config, elfa_config, redis_config
+from app.core.config import config, cmc_config, perplexity_config, elfa_config, redis_config, openai_config #, grok_config
 from utils.cmc_driver import CoinMarketCapDriver
 from utils.perplexity_driver import PerplexityDriver
 from utils.elfa_driver import ElfaDriver
 from utils.coingecko_driver import CryptoPriceFetcher
+from utils.chatGPT_driver import ChatGPTDriver
 
 # -------- Initialize CoinMarketCap Driver -----------------
 cmc_driver = CoinMarketCapDriver(
@@ -33,3 +34,5 @@ redis_db = Redis(
     username=redis_config.REDIS_USER,
     password=redis_config.REDIS_PASSWORD
 )
+
+chatgpt = ChatGPTDriver(api_key=openai_config.OPENAI_API_KEY)
