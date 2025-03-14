@@ -94,8 +94,11 @@ class ChatGPTDriver:
         :return: The response text from ChatGPT.
         """
         message = f"""
-        Parse X posts with $N{symbol} and retrieve 1 Top Bullish Post (most engaging one) and 1 Top FUD / Negative post.
+        Parse X posts which i add in posts data with ${symbol.upper()} and retrieve 1 Top Bullish Post (most engaging one) and 1 Top FUD / Negative post.
         Posts data: {post_data}
+        **Don't use "Based on your provided data, here is the requested analysis:"**
+        **Highlight text headings according to telegram's markdown with **<header>** **
+        **Вo not use the description of the analysis method**
         """
         messages = [
             {
@@ -114,7 +117,7 @@ class ChatGPTDriver:
                 temperature=temperature
             )
 
-            return response.choices[0]["message"]["content"]  # Extract response text
+            return response.choices[0].message.content  # Extract response text
 
         except Exception as e:
             return f"❌ Error communicating with ChatGPT: {str(e)}"

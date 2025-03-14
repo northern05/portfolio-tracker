@@ -44,7 +44,9 @@ class ElfaDriver:
             if not data.get('success', True):
                 raise Exception(f"API returned an error: {data.get('message', 'Unknown error')}")
 
-            return [{post.get()} for post in data['data']['data']]
+            return [{"content": post.get("content"),
+                     "mentioned_at": post.get("mentioned_at"),
+                     "metrics": post.get("metrics")} for post in data['data']['data']]
 
         except requests.exceptions.RequestException as e:
             raise Exception(f"Network error occurred: {e}")
