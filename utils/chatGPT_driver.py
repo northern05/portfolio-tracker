@@ -45,15 +45,11 @@ class ChatGPTDriver:
             - Highlight text headings according to telegram's Markdown with ** ** 
         """
         self.analize_prompt = """
-        I have collected the top {X} posts from ELFA Driver related to cryptocurrency discussions. Each post includes text content, engagement metrics (likes, comments, shares), and timestamps. Please analyze these posts based on the following criteria:
-        Sentiment Analysis: Determine whether each post expresses a positive (bullish), negative (FUD), or neutral sentiment. Provide an overall sentiment breakdown.
-        Key Topics & Trends: Identify the main topics discussed (e.g., Bitcoin, Ethereum, regulations, market predictions). Summarize the most mentioned subjects.
-        Top Bullish Post: Identify the most engaging bullish post (highest likes/comments/shares) that reflects strong positive sentiment.
-        Top FUD/Negative Post: Identify the most engaging FUD/negative post that reflects concerns, fear, or uncertainty.
-        Emotional Tone & Language: Analyze the tone (e.g., hype, panic, confidence, uncertainty).
-        Market Impact Correlation: If possible, suggest whether sentiment trends align with market movements (e.g., does bullish sentiment coincide with price increases?).
-        Anomalies & Noteworthy Insights: Highlight unexpected patterns, viral discussions, or unique viewpoints.
-        Return the analysis in a structured format with key takeaways and insights valuable for crypto traders and investors.
+        I have collected the top {X} posts from ELFA Driver related to cryptocurrency discussions. Each post includes text content, engagement metrics (likes, comments, shares), and timestamps. Please analyze  and return these posts based on the following criteria:
+        1. #### **Top Bullish Post:** 
+            - Identify the most engaging bullish post (highest likes/comments/shares) that reflects strong positive sentiment.
+        2. #### **Top FUD/Negative Post:**
+            - Identify the most engaging FUD/negative post that reflects concerns, fear, or uncertainty.
         Don't make summarizing and drop any summarizing if exists.
         Highlight text headings according to telegram's Markdown with**.
         """
@@ -99,9 +95,9 @@ class ChatGPTDriver:
         message = f"""
         Parse X posts which i add in posts data with ${symbol.upper()} and retrieve 1 Top Bullish Post (most engaging one) and 1 Top FUD / Negative post.
         Posts data: {post_data}
-        **Don't use "Based on your provided data, here is the requested analysis:"**
-        **Highlight text headings according to telegram's markdown with ** **
-        **don't use the description of the analysis method**
+        Don't use "Based on your provided data, here is the requested analysis:"
+        Highlight text headings according to telegram's markdown with ** **
+        don't use the description of the analysis method
         Don't make summarizing and drop any summarizing if exists.
         """
         messages = [
