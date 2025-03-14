@@ -42,7 +42,7 @@ class ChatGPTDriver:
             - Don't use "Based on the search results provided".
             - Don't make summarizing and drop any summarizing if exists
             - Don't use clarification on what the news is based on, just a list with active links on sources
-            - Highlight text headings according to telegram's Markdown with **<header>** 
+            - Highlight text headings according to telegram's Markdown with ** ** 
         """
         self.analize_prompt = """
         I have collected the top {X} posts from ELFA Driver related to cryptocurrency discussions. Each post includes text content, engagement metrics (likes, comments, shares), and timestamps. Please analyze these posts based on the following criteria:
@@ -55,7 +55,7 @@ class ChatGPTDriver:
         Anomalies & Noteworthy Insights: Highlight unexpected patterns, viral discussions, or unique viewpoints.
         Return the analysis in a structured format with key takeaways and insights valuable for crypto traders and investors.
         Don't make summarizing and drop any summarizing if exists.
-        Highlight text headings according to telegram's Markdown with **<header>**.
+        Highlight text headings according to telegram's Markdown with**.
         """
 
     def send_message(self, message: str, temperature: float = 0.7):
@@ -100,7 +100,7 @@ class ChatGPTDriver:
         Parse X posts which i add in posts data with ${symbol.upper()} and retrieve 1 Top Bullish Post (most engaging one) and 1 Top FUD / Negative post.
         Posts data: {post_data}
         **Don't use "Based on your provided data, here is the requested analysis:"**
-        **Highlight text headings according to telegram's markdown with **<header>** **
+        **Highlight text headings according to telegram's markdown with ** **
         **don't use the description of the analysis method**
         Don't make summarizing and drop any summarizing if exists.
         """

@@ -310,10 +310,10 @@ async def get_report(callback: types.CallbackQuery):
     if response.status_code == 200:
         data = response.json()
         news = data.get("related_news", "No news available.")
-        sentiment_score = data.get("sentiment_score", {})
+        sentiment_score = data.get("sentiment_score", "No sentiment score")
 
         # ✅ Send news & price separately
-        await callback.message.answer(f"📰 **News:**\n{news}", parse_mode='Markdown')
+        await callback.message.answer(f"📰 {news}", parse_mode='Markdown')
         await callback.message.answer(f"💰 **Sentiment_score:** {sentiment_score}", parse_mode='Markdown')
         await callback.message.answer("Maybe I can help you more?")
         await edit_portfolio_menu(callback.message)
