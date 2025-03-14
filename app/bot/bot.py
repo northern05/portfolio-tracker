@@ -35,8 +35,7 @@ self_id = 7540334723
 
 def get_similar_tokens(symbol: str):
     result = requests.get(f"{API_URL}/similar_assets", params={"asset_symbol": symbol})
-    similar_tokens = [symbol.get("symbol") for symbol in result.json()]
-    return similar_tokens
+    return result.json()
 
 
 def validate_wallet(address: str):
@@ -140,7 +139,7 @@ async def process_token(message: types.Message, state: FSMContext):
         return
 
     keyboard = types.ReplyKeyboardMarkup(
-        keyboard=[[types.KeyboardButton(text=str(token))] for token in similar_tokens],
+        keyboard=[[types.KeyboardButton(text=f"{str(token.get('symbol'))} {round(token.get('market_cap'), 2)}")] for token in similar_tokens],
         resize_keyboard=True,
         one_time_keyboard=True
     )
@@ -153,7 +152,7 @@ async def process_token(message: types.Message, state: FSMContext):
 async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
     symbol = message.text.upper()
     similar_tokens = get_similar_tokens(symbol=symbol)
-    if symbol not in similar_tokens:
+    if symbol not in [token.get("symbol") for token in similar_tokens]:
         await message.answer("No similar assets found. Please enter a different character:")
         return
     response = requests.post(f"{API_URL}", json={"telegram_id": str(message.from_user.id), "symbol": symbol})

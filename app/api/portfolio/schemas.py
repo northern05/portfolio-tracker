@@ -37,3 +37,4 @@ class SimilarAssetsResponse(BaseModel):
     symbol: str
     name: str
     image_url: str
+    market_cap: float
