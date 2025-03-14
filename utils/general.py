@@ -50,8 +50,7 @@ def create_crypto_sentiment_chart(historical_prices, sentiment_data):
     price_df["date"] = pd.to_datetime(price_df["date"])
 
     # Extract sentiment data
-    sentiment_list = sentiment_data["data"]
-    sentiment_df = pd.DataFrame(sentiment_list)
+    sentiment_df = pd.DataFrame(sentiment_data)
 
     # Convert timestamps to date
     sentiment_df["date"] = pd.to_datetime(sentiment_df["mentioned_at"]).dt.date
