@@ -45,6 +45,18 @@ def validate_wallet(address: str):
     return False, "❌ Invalid wallet address."
 
 
+def format_market_cap(market_cap):
+    """Formats the market cap to a human-readable format (B, M, K)."""
+    if market_cap >= 1_000_000_000:  # Billion
+        return f"MCap {market_cap / 1_000_000_000:.1f}B"
+    elif market_cap >= 1_000_000:  # Million
+        return f"MCap {market_cap / 1_000_000:.1f}M"
+    elif market_cap >= 1_000:  # Thousand
+        return f"MCap {market_cap / 1_000:.1f}K"
+    else:
+        return f"MCap {market_cap}"
+
+
 tg_router = Router()
 dp.include_router(tg_router)
 
@@ -139,7 +151,8 @@ async def process_token(message: types.Message, state: FSMContext):
         return
 
     keyboard = types.ReplyKeyboardMarkup(
-        keyboard=[[types.KeyboardButton(text=f"{str(token.get('symbol'))} {round(token.get('market_cap'), 2)}$")] for token in similar_tokens],
+        keyboard=[[types.KeyboardButton(text=f"{str(token.get('symbol'))} {format_market_cap(token.get('market_cap'))}$")] for
+                  token in similar_tokens],
         resize_keyboard=True,
         one_time_keyboard=True
     )
@@ -346,7 +359,8 @@ async def get_report(callback: types.CallbackQuery):
 
             # ✅ Send the chart image
             await bot.send_photo(chat_id=callback.from_user.id, photo=FSInputFile(image_path),
-                                 caption=f"📊 **Crypto Price** vs **Sentiment Analysis** for {coin}", parse_mode='Markdown')
+                                 caption=f"📊 **Crypto Price** vs **Sentiment Analysis** for {coin}",
+                                 parse_mode='Markdown')
 
             # Remove image after sending
             os.remove(image_path)
@@ -355,7 +369,8 @@ async def get_report(callback: types.CallbackQuery):
             return
 
         # Fetch additional data (News & Price)
-        response = requests.get(f"{API_URL}/selected", params={"telegram_id": str(callback.from_user.id), "symbol": coin})
+        response = requests.get(f"{API_URL}/selected",
+                                params={"telegram_id": str(callback.from_user.id), "symbol": coin})
         if response.status_code == 200:
             data = response.json()
             news = data.get("related_news", "No news available.")
