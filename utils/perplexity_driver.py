@@ -14,6 +14,10 @@ class PerplexityDriver:
                 3. **search for News about investment landscape and ecosystem updates**
                 4. **all this (news and prices) should be drawn up in the form of a template report and duplicates should be removed**
                 5. highlight text headings according to telegram's markdown with **<header>**
+                6. **Don't use phrases "Based on your provided data, here is the requested analysis:", "Here is a template report summarizing" etc.**
+                7. **Highlight text headings according to telegram's markdown with **<header>** **
+                8. **don't use the description of the analysis method**
+                9. **Don't make summarizing and drop any summarizing if exists.**
                 """
         prompt = f"""
                 1. retrieve news about the crypto asset "${symbol}" or "{full_token_name}" focusing on events that occurred between 03.03.2025 and 11.03.2025. 
