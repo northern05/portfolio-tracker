@@ -32,6 +32,7 @@ class PerplexityDriver:
                 don't use the description of the analysis method
                 Don't make summarizing and drop any summarizing if exists.
                 Add numbers to core paragraphs.      
+                Get only real news, don't generate it from yourself.
                 """
 
         messages = [
