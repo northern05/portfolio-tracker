@@ -8,6 +8,7 @@ from aiogram import Router, F, types, Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from aiogram.exceptions import TelegramBadRequest
 import re
 
 WALLET_REGEX = {
@@ -314,7 +315,11 @@ async def get_report(callback: types.CallbackQuery):
 
         # ✅ Send news & price separately
         await callback.message.answer(f"📰 {news}", parse_mode='Markdown')
-        await callback.message.answer(f"💰 **Sentiment_score:** {sentiment_score}", parse_mode='Markdown')
+        try:
+            await callback.message.answer(f"💰 **Sentiment_score:** {sentiment_score}", parse_mode='Markdown')
+        except TelegramBadRequest as e:
+            print(sentiment_score)
+            logging.critical(f"Can't parse score! {e}")
         await callback.message.answer("Maybe I can help you more?")
         await edit_portfolio_menu(callback.message)
     else:
