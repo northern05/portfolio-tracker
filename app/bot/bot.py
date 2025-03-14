@@ -139,7 +139,7 @@ async def process_token(message: types.Message, state: FSMContext):
         return
 
     keyboard = types.ReplyKeyboardMarkup(
-        keyboard=[[types.KeyboardButton(text=f"{str(token.get('symbol'))} {round(token.get('market_cap'), 2)}")] for token in similar_tokens],
+        keyboard=[[types.KeyboardButton(text=f"{str(token.get('symbol'))} {round(token.get('market_cap'), 2)}$")] for token in similar_tokens],
         resize_keyboard=True,
         one_time_keyboard=True
     )
@@ -150,7 +150,7 @@ async def process_token(message: types.Message, state: FSMContext):
 
 @tg_router.message(PortfolioState.enter_coin)
 async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
-    symbol = message.text.upper()
+    symbol = message.text.split()[0].upper()
     similar_tokens = get_similar_tokens(symbol=symbol)
     if symbol not in [token.get("symbol") for token in similar_tokens]:
         await message.answer("No similar assets found. Please enter a different character:")
