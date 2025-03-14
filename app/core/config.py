@@ -47,10 +47,6 @@ class PerplexitySettings(BaseSettings):
 class OpenAISettings(BaseSettings):
     OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY")
 
-class GrokSettings(BaseSettings):
-    GROK_URL: str = os.environ.get("GROK_URL", "https://api.grok.x.ai/v1")
-    GROK_API_KEY: str = os.environ.get("GROK_API_KEY", "")
-
 
 config = Config()
 db_config = DBSettings()
@@ -59,4 +55,3 @@ elfa_config = ElfaSettings()
 perplexity_config = PerplexitySettings()
 redis_config = RedisSettings()
 openai_config = OpenAISettings()
-grok_config = GrokSettings()

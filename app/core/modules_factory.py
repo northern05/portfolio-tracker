@@ -1,5 +1,5 @@
 from redis.asyncio import Redis
-from app.core.config import config, cmc_config, perplexity_config, elfa_config, redis_config, openai_config #, grok_config
+from app.core.config import config, cmc_config, perplexity_config, elfa_config, redis_config, openai_config
 from utils.cmc_driver import CoinMarketCapDriver
 from utils.perplexity_driver import PerplexityDriver
 from utils.elfa_driver import ElfaDriver
@@ -35,4 +35,5 @@ redis_db = Redis(
     password=redis_config.REDIS_PASSWORD
 )
 
+# -------- Initialize Chat GPT connection --------------------
 chatgpt = ChatGPTDriver(api_key=openai_config.OPENAI_API_KEY)

@@ -13,7 +13,7 @@ class PerplexityDriver:
                 2. search for News about price moves without any predictions
                 3. **search for News about investment landscape and ecosystem updates**
                 4. **all this (news and prices) should be drawn up in the form of a template report and duplicates should be removed**
-                highlight text headings according to telegram's markdown with **<header>**
+                5. highlight text headings according to telegram's markdown with **<header>**
                 """
         prompt = f"""
                 1. retrieve news about the crypto asset "${symbol}" or "{full_token_name}" focusing on events that occurred between 03.03.2025 and 11.03.2025. 

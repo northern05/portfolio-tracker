@@ -24,7 +24,7 @@ class PortfolioResponse(PortfolioBase):
 
 class PortfolioResponseExtended(PortfolioBase):
     related_news: str | None = None
-    current_price: dict | None = None
+    sentiment_score: dict | None = None
 
 
 class ConnectTelegram(BaseModel):

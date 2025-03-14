@@ -7,7 +7,7 @@ class ElfaDriver:
         self.ELFA_API_KEY = api_key
 
     def get_top_posts(self, symbol: str, time_window: str = "7d", page: int = 1,
-                      page_size: int = 10):
+                      page_size: int = 50):
         url = f'{self.ELFA_URL}/top-mentions?ticker={symbol}&timeWindow={time_window}&page={page}&pageSize={page_size}'
         headers = {
             'x-elfa-api-key': self.ELFA_API_KEY
@@ -44,7 +44,7 @@ class ElfaDriver:
             if not data.get('success', True):
                 raise Exception(f"API returned an error: {data.get('message', 'Unknown error')}")
 
-            return data['data']
+            return [{post.get()} for post in data['data']['data']]
 
         except requests.exceptions.RequestException as e:
             raise Exception(f"Network error occurred: {e}")
