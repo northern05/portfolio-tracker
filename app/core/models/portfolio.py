@@ -5,8 +5,9 @@ from .base import Base
 
 
 class Portfolio(Base):
-    symbol = mapped_column(String, nullable=False, index=True)
+    symbol: Mapped[str] = mapped_column(String, nullable=False, index=True)
     period_days: Mapped[int] = mapped_column(Integer, nullable=True)
+    twitter: Mapped[str] = mapped_column(String)
 
     def __repr__(self):
         return f"<Portfolio by asset {self.symbol}, with period {self.period_days}>"

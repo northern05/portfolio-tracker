@@ -12,6 +12,7 @@ class PortfolioBase(BaseModel):
 class PortfolioCreate(BaseModel):
     telegram_id: str
     symbol: str
+    twitter: str
 
 
 class PortfolioUpdate(PortfolioBase):
@@ -25,6 +26,7 @@ class PortfolioResponse(PortfolioBase):
 class PortfolioResponseExtended(PortfolioBase):
     related_news: str | None = None
     sentiment_score: str | None = None
+    current_price: dict | None = None
 
 
 class ConnectTelegram(BaseModel):
@@ -38,3 +40,5 @@ class SimilarAssetsResponse(BaseModel):
     name: str
     image_url: str
     market_cap: float
+    token_id: str
+    twitter: str | None = None

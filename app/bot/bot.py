@@ -3,6 +3,7 @@ import os
 from typing import Union
 
 import requests
+from aiogram.client.default import DefaultBotProperties
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from aiogram import Router, F, types, Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
@@ -27,14 +28,17 @@ API_URL: str = os.environ.get('BASE_SITE', "https://api.agent.zpoken.dev/portfol
 API_KEY: str = os.environ.get('TG_API_KEY', "tg_api_key")
 MAX_BUTTONS_PER_MESSAGE = 10
 
-bot = Bot(token=TOKEN)
+bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='Markdown'))
 dp = Dispatcher()
 
 self_id = 7540334723
 
 
-def get_similar_tokens(symbol: str):
-    result = requests.get(f"{API_URL}/similar_assets", params={"asset_symbol": symbol})
+def get_similar_tokens(symbol: str, token_id: str = None):
+    params = {"asset_symbol": symbol}
+    if id:
+        params.update({"token_id": token_id})
+    result = requests.get(f"{API_URL}/similar_assets", params=params)
     return result.json()
 
 
@@ -151,8 +155,9 @@ async def process_token(message: types.Message, state: FSMContext):
         return
 
     keyboard = types.ReplyKeyboardMarkup(
-        keyboard=[[types.KeyboardButton(text=f"{str(token.get('symbol'))} {format_market_cap(token.get('market_cap'))}$")] for
-                  token in similar_tokens],
+        keyboard=[
+            [types.KeyboardButton(text=f"{str(token.get('symbol'))} {format_market_cap(token.get('market_cap'))}$ {token.get('token_id')}")] for
+            token in similar_tokens],
         resize_keyboard=True,
         one_time_keyboard=True
     )
@@ -164,11 +169,12 @@ async def process_token(message: types.Message, state: FSMContext):
 @tg_router.message(PortfolioState.enter_coin)
 async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
     symbol = message.text.split()[0].upper()
-    similar_tokens = get_similar_tokens(symbol=symbol)
+    token_id = message.text.split()[2]
+    similar_tokens = get_similar_tokens(symbol=symbol, token_id=token_id)
     if symbol not in [token.get("symbol") for token in similar_tokens]:
         await message.answer("No similar assets found. Please enter a different character:")
         return
-    response = requests.post(f"{API_URL}", json={"telegram_id": str(message.from_user.id), "symbol": symbol})
+    response = requests.post(f"{API_URL}", json={"telegram_id": str(message.from_user.id), "symbol": symbol, "twitter": similar_tokens['twitter']})
 
     if response.status_code == 200:
         await state.clear()
@@ -324,9 +330,11 @@ async def get_report(callback: types.CallbackQuery):
         data = response.json()
         news = data.get("related_news", "No news available.")
         sentiment_score = data.get("sentiment_score", "No sentiment score")
+        price = data.get("current_price", {}).get("price_usd", "N/A")
 
         # ✅ Send news & price separately
         await callback.message.answer(f"📰 {news}", parse_mode='Markdown')
+        await callback.message.answer(f"💰 **Current price:** {price} USD", parse_mode='Markdown')
         try:
             await callback.message.answer(f"💰 **Sentiment_score:** {sentiment_score}", parse_mode='Markdown')
         except TelegramBadRequest as e:

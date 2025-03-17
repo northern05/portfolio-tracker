@@ -50,7 +50,7 @@ class CryptoPriceFetcher:
 
         return coin["id"] if coin else None
 
-    def get_token_name(self, symbol: str):
+    def get_token_name(self, symbol: str, token_id: str):
         """Fetches the full token name from CoinGecko by its symbol, prioritizing well-known tokens."""
         url = f"{self.BASE_URL}/coins/list"
         response = requests.get(url)
@@ -59,20 +59,63 @@ class CryptoPriceFetcher:
             data = response.json()
 
             # Find all tokens matching the symbol
-            matching_tokens = [coin for coin in data if coin["symbol"].lower() == symbol.lower()]
+            matching_token = [coin for coin in data if coin["symbol"].lower() == symbol.lower() and coin["id"].lower == token_id.lower()]
 
-            if not matching_tokens:
+            if not matching_token:
                 return f"Token '{symbol}' not found."
 
-            # Prioritize Ethereum if ETH is requested
-            for token in matching_tokens:
-                if token["id"] == "ethereum":
-                    return token["name"]  # Ensures "Ethereum" is returned instead of a bridged version
-
             # Return the first found token if no special case (like ETH)
-            return matching_tokens[0]["name"]
+            return matching_token[0]["name"]
 
         return "Error fetching data from CoinGecko."
+
+    def get_twitter_from_coingecko(self, token_id):
+        url = f"{self.BASE_URL}/coins/{token_id}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            twitter_url = data.get("links", {}).get("twitter_screen_name")
+
+            if twitter_url:
+                return f"https://twitter.com/{twitter_url}"
+            else:
+                return "No Twitter account found."
+        else:
+            return "Error fetching data."
+
+    def get_similar_tokens(self, symbol: str):
+        """Fetches the top 10 most popular tokens similar to the given symbol, sorted by market cap."""
+        url = f"{self.BASE_URL}/coins/markets"
+        params = {
+            "vs_currency": "usd",  # Get market data in USD
+            "order": "market_cap_desc",  # Sort by market cap
+            "per_page": 250,  # Fetch top 250 coins (increase if needed)
+            "page": 1,
+            "sparkline": "false"  # No need for sparkline data
+        }
+        response = requests.get(url, params=params)
+
+        if response.status_code != 200:
+            return {"error": "Failed to fetch data from CoinGecko"}
+
+        data = response.json()
+
+        # Filter tokens that match the symbol in name or symbol
+        similar_tokens = [
+            {
+                "token_id": token["id"],
+                "name": token["name"],
+                "symbol": token["symbol"].upper(),
+                "market_cap": token["market_cap"],
+                "image_url": token["image"]
+            }
+            for token in data if symbol.lower() in token["symbol"].lower() or symbol.lower() in token["name"].lower()
+        ]
+
+        # Sort by market capitalization and return top 10
+        top_similar_tokens = sorted(similar_tokens, key=lambda x: x["market_cap"], reverse=True)[:10]
+        return top_similar_tokens
 
 
 if __name__ == '__main__':

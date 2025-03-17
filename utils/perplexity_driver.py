@@ -7,7 +7,7 @@ class PerplexityDriver:
         self.model = "sonar-pro"
         self.client = OpenAI(api_key=api_key, base_url=base_url)
 
-    def chat_without_streaming(self, symbol: str | list, full_token_name: str):
+    def chat_without_streaming(self, symbol: str | list, full_token_name: str, twitter: str):
         message = f"""
                 1. Find News about {symbol} from {datetime.now() - timedelta(days=7)} to {datetime.now()}
                 2. search for News about price moves without any predictions

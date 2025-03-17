@@ -11,10 +11,10 @@ logger = logging.getLogger('portfolio/views')
 @router.get(
     "/similar_assets",
     status_code=status.HTTP_200_OK,
-    response_model=list[schemas.SimilarAssetsResponse],
+    response_model=list[schemas.SimilarAssetsResponse] | schemas.SimilarAssetsResponse,
 )
 async def get_similar_assets(
-        result: list[schemas.SimilarAssetsResponse] = Depends(dependencies.get_similar_assets)
+        result: list[schemas.SimilarAssetsResponse] | schemas.SimilarAssetsResponse = Depends(dependencies.get_similar_assets)
 ):
     """
     Endpoint to get similar assets

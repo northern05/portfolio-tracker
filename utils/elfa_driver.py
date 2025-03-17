@@ -1,3 +1,4 @@
+import re
 import requests
 
 
@@ -6,9 +7,24 @@ class ElfaDriver:
         self.ELFA_URL = base_url
         self.ELFA_API_KEY = api_key
 
+    def is_valid_ticker(self, post_text, symbol):
+        """Check if the symbol is referenced correctly."""
+        pattern = rf"\b{symbol}\b"  # Ensure it's a standalone word
+        return bool(re.search(pattern, post_text, re.IGNORECASE))
+
+    def get_squeeze(self, symbol: str):
+        all_tickers = [f"${symbol}", f"#{symbol}", symbol]
+        tweets = []
+        for ticker in all_tickers:
+            result = self.get_top_posts(symbol=ticker)
+            tweets.extend(result)
+
+        filtered_tweets = [tweet for tweet in tweets if self.is_valid_ticker(tweet["content"], symbol)]
+        return filtered_tweets
+
     def get_top_posts(self, symbol: str, time_window: str = "7d", page: int = 1,
                       page_size: int = 50):
-        url = f'{self.ELFA_URL}/top-mentions?ticker={symbol}&timeWindow={time_window}&page={page}&pageSize={page_size}'
+        url = f'{self.ELFA_URL}/top-mentions?ticker=${symbol}&timeWindow={time_window}&page={page}&pageSize={page_size}'
         headers = {
             'x-elfa-api-key': self.ELFA_API_KEY
         }
@@ -44,9 +60,7 @@ class ElfaDriver:
             if not data.get('success', True):
                 raise Exception(f"API returned an error: {data.get('message', 'Unknown error')}")
 
-            return [{"content": post.get("content"),
-                     "mentioned_at": post.get("mentioned_at"),
-                     "metrics": post.get("metrics")} for post in data['data']['data']]
+            return data['data']['data']
 
         except requests.exceptions.RequestException as e:
             raise Exception(f"Network error occurred: {e}")
