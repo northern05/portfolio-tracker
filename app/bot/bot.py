@@ -36,7 +36,7 @@ self_id = 7540334723
 
 def get_similar_tokens(symbol: str, token_id: str = None):
     params = {"asset_symbol": symbol}
-    if id:
+    if token_id:
         params.update({"token_id": token_id})
     result = requests.get(f"{API_URL}/similar_assets", params=params)
     return result.json()
@@ -169,12 +169,12 @@ async def process_token(message: types.Message, state: FSMContext):
 @tg_router.message(PortfolioState.enter_coin)
 async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
     symbol = message.text.split()[0].upper()
-    token_id = message.text.split()[2]
-    similar_tokens = get_similar_tokens(symbol=symbol, token_id=token_id)
-    if symbol not in [token.get("symbol") for token in similar_tokens]:
+    token_id = message.text.split()[3]
+    similar_token = get_similar_tokens(symbol=symbol, token_id=token_id)
+    if symbol != similar_token.get("symbol"):
         await message.answer("No similar assets found. Please enter a different character:")
         return
-    response = requests.post(f"{API_URL}", json={"telegram_id": str(message.from_user.id), "symbol": symbol, "twitter": similar_tokens['twitter']})
+    response = requests.post(f"{API_URL}", json={"telegram_id": str(message.from_user.id), "symbol": symbol, "twitter": similar_token.get('twitter')})
 
     if response.status_code == 200:
         await state.clear()
