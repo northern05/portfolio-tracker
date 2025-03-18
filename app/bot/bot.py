@@ -343,7 +343,7 @@ async def get_report(callback: types.CallbackQuery):
         await callback.message.answer(f"📈 {price_movements}", parse_mode='Markdown')
         await callback.message.answer(f"🌐 {investment_landscape}", parse_mode='Markdown')
         await callback.message.answer(f"📊 {sentiment_score}", parse_mode='Markdown')
-        await callback.message.answer(f"💰 **Current price:** {price} USD", parse_mode='Markdown')
+        await callback.message.answer(f"💰 **Current price:** {round(price, 2)} USD", parse_mode='Markdown')
         await callback.message.answer("Maybe I can help you more?")
         await edit_portfolio_menu(callback.message)
     else:

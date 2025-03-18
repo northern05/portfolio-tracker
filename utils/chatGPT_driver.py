@@ -58,7 +58,7 @@ class ChatGPTDriver:
                 Parse X posts which i add in posts data with ${symbol.upper()} and retrieve 1 Top Bullish Post (most engaging one) and 1 Top FUD / Negative post.
                 Posts data: {post_data}
                 Don't use "Based on your provided data, here is the requested analysis:"
-                Highlight text headings according to telegram's markdown with ** **
+                Highlight text headings according to telegram's markdown with **
                 don't use the description of the analysis method
                 Don't make summarizing and drop any summarizing if exists.
                 RETURN as a template:
