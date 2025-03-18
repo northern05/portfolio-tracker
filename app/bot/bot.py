@@ -320,7 +320,7 @@ async def get_report(callback: types.CallbackQuery):
 
         # ✅ Send the chart image
         await bot.send_photo(chat_id=callback.from_user.id, photo=FSInputFile(image_path),
-                             caption="📊 **Crypto Price** vs **Sentiment Analysis**", parse_mode='Markdown')
+                             caption="📊 **Price movements**", parse_mode='Markdown')
 
         # Remove image after sending
         os.remove(image_path)
