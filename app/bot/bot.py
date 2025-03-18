@@ -203,7 +203,7 @@ async def edit_portfolio_menu(message: types.Message):
 
         if not coins:
             await message.answer(
-                "Your portfolio is empty, you can add wallet with **/add_wallet**, and then add coins with **/add_coin**.",
+                "Your portfolio is empty, you can add wallet with add coins with **/add_coin**.",
                 parse_mode='Markdown')
             return
 
