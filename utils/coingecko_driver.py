@@ -20,7 +20,7 @@ class CryptoPriceFetcher:
             return {"error": f"Token '{symbol}' not found"}
 
         url = f"{self.BASE_URL}/coins/{coin_id}/market_chart"
-        params = {"vs_currency": currency, "days": days, "interval": "hourly"}
+        params = {"vs_currency": currency, "days": days}
 
         response = requests.get(url, params=params)
         if response.status_code != 200:
@@ -31,7 +31,7 @@ class CryptoPriceFetcher:
 
         # Format response
         historical_data = [
-            {"date": datetime.datetime.utcfromtimestamp(price[0] / 1000).strftime("%Y-%m-%d"), "price": price[1]}
+            {"date": datetime.datetime.utcfromtimestamp(price[0] / 1000).strftime("%Y-%m-%d %H:%M:%S"), "price": price[1]}
             for price in prices
         ]
 
@@ -80,9 +80,9 @@ class CryptoPriceFetcher:
             if twitter_url:
                 return f"https://twitter.com/{twitter_url}"
             else:
-                return "No Twitter account found."
+                return None
         else:
-            return "Error fetching data."
+            return None
 
     def get_similar_tokens(self, symbol: str):
         """Fetches the top 10 most popular tokens similar to the given symbol, sorted by market cap."""

@@ -4,6 +4,7 @@ import requests
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+from scipy.interpolate import make_interp_spline
 
 
 def generate_session_id() -> str:
@@ -49,64 +50,33 @@ def create_crypto_sentiment_chart(historical_prices, sentiment_data: dict = None
     price_df = pd.DataFrame(historical_prices)
     price_df["date"] = pd.to_datetime(price_df["date"])
 
-    if sentiment_data:
-        # Extract sentiment data
-        sentiment_df = pd.DataFrame(sentiment_data)
+    # Sort data by date
+    price_df = price_df.sort_values("date")
 
-        # Convert timestamps to date
-        sentiment_df["date"] = pd.to_datetime(sentiment_df["mentioned_at"]).dt.date
+    # Convert dates to numerical values
+    x_numeric = np.arange(len(price_df))
+    y_smooth = make_interp_spline(x_numeric, price_df["price"], k=3)(x_numeric)
 
-        # Calculate sentiment score based on post metrics
-        sentiment_df["sentiment_score"] = (
-            sentiment_df["metrics"].apply(lambda x: x["like_count"] * 0.4 +
-                                                    x["reply_count"] * 0.2 +
-                                                    x["repost_count"] * 0.3 +
-                                                    x["view_count"] * 0.1)
-        )
-
-        # Aggregate sentiment scores per day
-        sentiment_grouped = sentiment_df.groupby("date")["sentiment_score"].sum().reset_index()
-        sentiment_grouped["date"] = pd.to_datetime(sentiment_grouped["date"])  # Convert to datetime
-
-        # Merge price and sentiment data
-        merged_df = pd.merge(price_df, sentiment_grouped, on="date", how="left").ffill()
-    else:
-        merged_df = price_df
-
-        # Create Figure
+    # Create Figure
     fig = go.Figure()
 
-    # Add Price Line (Orange) - Left Y-axis
     fig.add_trace(go.Scatter(
-        x=merged_df["date"], y=merged_df["price"],
-        mode="lines", name="Price (USD)",
+        x=price_df["date"],
+        y=y_smooth,
+        mode="lines",
+        name="Price (USD)",
         line=dict(color="orange", width=2),
         yaxis="y1"
     ))
 
-    # # Add Sentiment Score Line (Blue) - Right Y-axis
-    # fig.add_trace(go.Scatter(
-    #     x=merged_df["date"], y=merged_df["sentiment_score"],
-    #     mode="lines", name="Sentiment Score",
-    #     line=dict(color="cyan", width=2, dash="dot"),  # Dashed line for differentiation
-    #     yaxis="y2"
-    # ))
-
     # Layout Settings
     fig.update_layout(
-        title="Crypto Price vs Sentiment Analysis",
+        title="Crypto Price",
         xaxis=dict(title="Date"),
         yaxis=dict(
-            title=dict(text="Price (USD)", font=dict(color="orange")),  # ✅ Correct
-            tickfont=dict(color="orange"),
+            title=dict(text="Price (USD)", font=dict(color="orange")),
             side="left"
         ),
-        # yaxis2=dict(
-        #     title=dict(text="Sentiment Score", font=dict(color="cyan")),  # ✅ Correct
-        #     tickfont=dict(color="cyan"),
-        #     overlaying="y",
-        #     side="right"
-        # ),
         template="plotly_dark",
         legend_title="Metrics"
     )

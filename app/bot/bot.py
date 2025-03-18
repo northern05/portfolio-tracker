@@ -333,17 +333,11 @@ async def get_report(callback: types.CallbackQuery):
     if response.status_code == 200:
         data = response.json()
         news = data.get("related_news", "No news available.")
-        sentiment_score = data.get("sentiment_score", "No sentiment score")
         price = data.get("current_price", {}).get("price_usd", "N/A")
 
         # ✅ Send news & price separately
         await callback.message.answer(f"📰 {news}", parse_mode='Markdown')
         await callback.message.answer(f"💰 **Current price:** {price} USD", parse_mode='Markdown')
-        try:
-            await callback.message.answer(f"💰 **Sentiment_score:** {sentiment_score}", parse_mode='Markdown')
-        except TelegramBadRequest as e:
-            print(sentiment_score)
-            logging.critical(f"Can't parse score! {e}")
         await callback.message.answer("Maybe I can help you more?")
         await edit_portfolio_menu(callback.message)
     else:
