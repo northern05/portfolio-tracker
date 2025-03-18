@@ -1,4 +1,5 @@
 import io
+from datetime import datetime, timedelta
 import uuid
 import requests
 import plotly.graph_objects as go
@@ -47,8 +48,10 @@ def create_crypto_sentiment_chart(historical_prices, sentiment_data: dict = None
     - A Plotly figure.
     """
     # Convert historical prices to DataFrame
+    seven_days_ago = datetime.now() - timedelta(days=7)
     price_df = pd.DataFrame(historical_prices)
     price_df["date"] = pd.to_datetime(price_df["date"])
+    price_df = price_df[price_df["date"] >= seven_days_ago]
 
     # Sort data by date
     price_df = price_df.sort_values("date")
