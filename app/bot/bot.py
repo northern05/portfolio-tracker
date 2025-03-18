@@ -80,7 +80,7 @@ async def on_startup(bot: Bot):
 async def set_bot_commands(bot: Bot):
     commands = [
         types.BotCommand(command="start", description="Start the bot"),
-        types.BotCommand(command="add_wallet", description="Add your crypto wallet"),
+        # types.BotCommand(command="add_wallet", description="Add your crypto wallet"),
         types.BotCommand(command="my_portfolio", description="View your portfolio"),
         types.BotCommand(command="get_report_menu", description="Get a 7-day report for a coin"),
         types.BotCommand(command="help", description="Show help menu")
@@ -93,7 +93,7 @@ async def show_commands(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="📌 Start", callback_data="cmd_start")],
-            [InlineKeyboardButton(text="💼 Add Wallet", callback_data="cmd_add_wallet")],
+            # [InlineKeyboardButton(text="💼 Add Wallet", callback_data="cmd_add_wallet")],
             [InlineKeyboardButton(text="📊 View Portfolio", callback_data="cmd_my_portfolio")],
             [InlineKeyboardButton(text="📉 Get Report", callback_data="cmd_get_report")],
             [InlineKeyboardButton(text="ℹ️ Help", callback_data="cmd_help")]
@@ -106,7 +106,7 @@ async def show_commands(message: types.Message):
 async def handle_command_callback(callback: types.CallbackQuery):
     command_map = {
         "cmd_start": "/start - Start the bot",
-        "cmd_add_wallet": "/add_wallet - Add your crypto wallet",
+        # "cmd_add_wallet": "/add_wallet - Add your crypto wallet",
         "cmd_my_portfolio": "/my_portfolio - View your portfolio",
         "cmd_get_report": "/get_report_menu - Get a 7-day report for a coin",
         "cmd_help": "/help - Show help message"
@@ -122,28 +122,31 @@ async def handle_command_callback(callback: types.CallbackQuery):
 @tg_router.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext) -> None:
     await state.clear()
-    await state.set_state(PortfolioState.entering_wallet)
+    # await state.set_state(PortfolioState.entering_wallet)
+    # await message.answer("Hi! I will tell you all news about cryptocurrency you want!")
+    # await message.answer("Enter your crypto-wallet to create your own portfolio:")
+    await state.set_state(PortfolioState.choosing_coin)
     await message.answer("Hi! I will tell you all news about cryptocurrency you want!")
-    await message.answer("Enter your crypto-wallet to create your own portfolio:")
+    await message.answer("Enter your currency you want to get report:")
 
 
-@tg_router.message(PortfolioState.entering_wallet)
-async def save_wallet(message: types.Message, state: FSMContext):
-    wallet = message.text.strip()
-    result, msg = validate_wallet(address=wallet)
-    if result:
-        response = requests.post(f"{API_URL}/connect_telegram",
-                                 json={"telegram_id": str(message.from_user.id), "wallet": wallet})
-        if response.status_code == 200:
-            await state.set_state(PortfolioState.choosing_coin)
-            await message.answer(
-                "Wallet saved! Enter cryptocurrency you want to see news (for example: BTC, ETH, SOL):")
-        else:
-            await message.answer("Error wallet adding. Try another one time.")
-    else:
-        await message.answer(msg)
-        await message.answer("Enter your crypto-wallet to create your own portfolio:")
-        await state.set_state(PortfolioState.entering_wallet)
+# @tg_router.message(PortfolioState.entering_wallet)
+# async def save_wallet(message: types.Message, state: FSMContext):
+#     wallet = message.text.strip()
+#     result, msg = validate_wallet(address=wallet)
+#     if result:
+#         response = requests.post(f"{API_URL}/connect_telegram",
+#                                  json={"telegram_id": str(message.from_user.id), "wallet": wallet})
+#         if response.status_code == 200:
+#             await state.set_state(PortfolioState.choosing_coin)
+#             await message.answer(
+#                 "Wallet saved! Enter cryptocurrency you want to see news (for example: BTC, ETH, SOL):")
+#         else:
+#             await message.answer("Error wallet adding. Try another one time.")
+#     else:
+#         await message.answer(msg)
+#         await message.answer("Enter your crypto-wallet to create your own portfolio:")
+#         await state.set_state(PortfolioState.entering_wallet)
 
 
 @tg_router.message(PortfolioState.choosing_coin)

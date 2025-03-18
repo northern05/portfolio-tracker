@@ -19,12 +19,6 @@ async def get_users_assets(session: AsyncSession, user_id: int) -> list | None:
 
 
 async def create(session: AsyncSession, portfolio_data: PortfolioCreate) -> Portfolio | None:
-    user_stmt = (
-        select(User)
-        .filter(User.telegram_id == portfolio_data.telegram_id)
-    )
-    result: Result = await session.execute(user_stmt)
-    user = result.scalars().first()
     portfolio = await get_by_symbol(session=session, symbol=portfolio_data.symbol)
     if not portfolio:
         portfolio = Portfolio(
@@ -34,13 +28,13 @@ async def create(session: AsyncSession, portfolio_data: PortfolioCreate) -> Port
         await session.commit()
     portfolio_user_stmt = (
         select(PortfolioUser)
-        .filter(PortfolioUser.user_id == user.id)
+        .filter(PortfolioUser.telegram_id == portfolio_data.telegram_id)
         .filter(PortfolioUser.portfolio_id == portfolio.id)
     )
     result: Result = await session.execute(portfolio_user_stmt)
     portfolio_user = result.scalars().first()
     if not portfolio_user:
-        portfolio_user = PortfolioUser(portfolio_id=portfolio.id, user_id=user.id)
+        portfolio_user = PortfolioUser(portfolio_id=portfolio.id, telegram_id=portfolio_data.telegram_id)
         session.add(portfolio_user)
         await session.commit()
     return portfolio

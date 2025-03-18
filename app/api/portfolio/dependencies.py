@@ -68,7 +68,7 @@ async def get_selected_portfolio(
         twitter=portfolio.twitter
     )
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
-    response_data.sentiment_score = chatgpt.post_llama(symbol=symbol, post_data=sentiment_score)
+    response_data.sentiment_score = chatgpt.post_llama(symbol=symbol, post_data=sentiment_score).removesuffix("</s>")
     await redis_db.set(portfolio.symbol, response_data.json(), ex=86400)
     return response_data
 
