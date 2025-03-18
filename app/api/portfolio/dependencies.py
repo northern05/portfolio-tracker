@@ -88,7 +88,7 @@ async def get_sentiment_score(
         )
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
     response_data = SentimentScore(
-        sentiment_score=chatgpt.post_llama(symbol=symbol, post_data=sentiment_score).removesuffix("</s>").replace('\n', '  \n'))
+        sentiment_score=chatgpt.post_llama(symbol=symbol, post_data=sentiment_score).removesuffix("</s>").replace('\n', ' \n '))
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
 
