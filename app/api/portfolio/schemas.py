@@ -13,6 +13,7 @@ class PortfolioCreate(BaseModel):
     telegram_id: str
     symbol: str
     twitter: str
+    coingecko_id: str
 
 
 class PortfolioUpdate(PortfolioBase):

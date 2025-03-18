@@ -174,7 +174,11 @@ async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
     if symbol != similar_token.get("symbol"):
         await message.answer("No similar assets found. Please enter a different character:")
         return
-    response = requests.post(f"{API_URL}", json={"telegram_id": str(message.from_user.id), "symbol": symbol, "twitter": similar_token.get('twitter')})
+    response = requests.post(f"{API_URL}", json={
+        "telegram_id": str(message.from_user.id),
+        "symbol": symbol,
+        "twitter": similar_token.get('twitter'),
+        "coingecko_id": similar_token.get('token_id')})
 
     if response.status_code == 200:
         await state.clear()

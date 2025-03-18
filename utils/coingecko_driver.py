@@ -20,7 +20,7 @@ class CryptoPriceFetcher:
             return {"error": f"Token '{symbol}' not found"}
 
         url = f"{self.BASE_URL}/coins/{coin_id}/market_chart"
-        params = {"vs_currency": currency, "days": days, "interval": "daily"}
+        params = {"vs_currency": currency, "days": days, "interval": "hourly"}
 
         response = requests.get(url, params=params)
         if response.status_code != 200:
