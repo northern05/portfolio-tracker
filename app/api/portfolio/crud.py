@@ -6,11 +6,11 @@ from .schemas import PortfolioCreate, PortfolioUpdate, PortfolioResponse
 from app.core.models import Portfolio, PortfolioUser, User
 
 
-async def get_users_assets(session: AsyncSession, user_id: int) -> list | None:
+async def get_users_assets(session: AsyncSession, telegram_id: str) -> list | None:
     stmt = (
         select(Portfolio)
         .join(PortfolioUser, PortfolioUser.portfolio_id == Portfolio.id)
-        .filter(PortfolioUser.user_id == user_id)
+        .filter(PortfolioUser.telegram_id == telegram_id)
         .order_by(Portfolio.symbol)
     )
     result: Result = await session.execute(stmt)
@@ -87,9 +87,8 @@ async def delete_users_portfolio(
 ):
     stmt = (
         select(PortfolioUser)
-        .join(User, User.id == PortfolioUser.user_id)
         .join(Portfolio, Portfolio.id == PortfolioUser.portfolio_id)
-        .filter(User.telegram_id == telegram_id)
+        .filter(PortfolioUser.telegram_id == telegram_id)
         .filter(func.lower(Portfolio.symbol) == symbol.lower())
     )
     result: Result = await session.execute(stmt)
