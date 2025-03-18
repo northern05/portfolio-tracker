@@ -1,5 +1,5 @@
-prompts = [{"news": {
-    "perplexity_prompt": "retrieve news about the crypto asset %s, %s, %s focusing on events that occurred between %s and %s."
+prompts = [{"related_news": {
+    "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between %s and %s."
                          "Ensure the target the event occurrence dates (not the publication dates). "
                          "Include language-agnostic keywords since all languages should be accepted (non-English articles will later be translated to English)",
     "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### **News** [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].",

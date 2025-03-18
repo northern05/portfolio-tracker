@@ -68,8 +68,7 @@ async def get_selected_portfolio(
         twitter=portfolio.twitter
     )
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
-    result = chatgpt.post_llama(symbol=symbol, post_data=sentiment_score)
-    response_data.sentiment_score = result
+    response_data.sentiment_score = chatgpt.post_llama(symbol=symbol, post_data=sentiment_score)
     await redis_db.set(portfolio.symbol, response_data.json(), ex=86400)
     return response_data
 
@@ -82,11 +81,13 @@ async def create_report(
 ):
     for block in prompts.prompts:
         for k, v in block.items():
-            getattr(data, k, perplexity_driver.chat_without_streaming(
+            perplexity_result = perplexity_driver.chat_without_streaming(
                 message=v.get("msg") % (
                 symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
                 prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
-            ))
+            )
+            chatgpt_processing = chatgpt.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))
+            setattr(data, k, chatgpt_processing)
     return data
 
 

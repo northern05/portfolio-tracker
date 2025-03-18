@@ -334,9 +334,15 @@ async def get_report(callback: types.CallbackQuery):
         data = response.json()
         news = data.get("related_news", "No news available.")
         price = data.get("current_price", {}).get("price_usd", "N/A")
+        price_movements = data.get("price_movements", "No news available.")
+        investment_landscape = data.get("investment_landscape", "No news available.")
+        sentiment_score = data.get("sentiment_score", "No news available.")
 
         # ✅ Send news & price separately
         await callback.message.answer(f"📰 {news}", parse_mode='Markdown')
+        await callback.message.answer(f"📈 {price_movements}", parse_mode='Markdown')
+        await callback.message.answer(f"🌐 {investment_landscape}", parse_mode='Markdown')
+        await callback.message.answer(f"📊 {sentiment_score}", parse_mode='Markdown')
         await callback.message.answer(f"💰 **Current price:** {price} USD", parse_mode='Markdown')
         await callback.message.answer("Maybe I can help you more?")
         await edit_portfolio_menu(callback.message)

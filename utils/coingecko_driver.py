@@ -52,20 +52,14 @@ class CryptoPriceFetcher:
 
     def get_token_name(self, symbol: str, token_id: str):
         """Fetches the full token name from CoinGecko by its symbol, prioritizing well-known tokens."""
-        url = f"{self.BASE_URL}/coins/list"
+        url = f"{self.BASE_URL}/coins/{token_id}"
         response = requests.get(url)
 
         if response.status_code == 200:
             data = response.json()
 
-            # Find all tokens matching the symbol
-            matching_token = [coin for coin in data if coin["symbol"].lower() == symbol.lower() and coin["id"].lower == token_id.lower()]
-
-            if not matching_token:
-                return f"Token '{symbol}' not found."
-
             # Return the first found token if no special case (like ETH)
-            return matching_token[0]["name"]
+            return data["name"]
 
         return "Error fetching data from CoinGecko."
 
