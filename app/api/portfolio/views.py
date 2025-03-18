@@ -14,7 +14,8 @@ logger = logging.getLogger('portfolio/views')
     response_model=list[schemas.SimilarAssetsResponse] | schemas.SimilarAssetsResponse,
 )
 async def get_similar_assets(
-        result: list[schemas.SimilarAssetsResponse] | schemas.SimilarAssetsResponse = Depends(dependencies.get_similar_assets)
+        result: list[schemas.SimilarAssetsResponse] | schemas.SimilarAssetsResponse = Depends(
+            dependencies.get_similar_assets)
 ):
     """
     Endpoint to get similar assets
@@ -49,7 +50,6 @@ async def create_portfolio(
 ):
     """
     Endpoint to get portfolio over user
-    :param session: session to connect to database
     :return: list portfolio
     """
     return result
@@ -80,10 +80,10 @@ async def get_selected_portfolio(
 ):
     """
     Endpoint to get selected portfolio over user
-    :param portfolio_id: portfolio id
     :return: portfolio extended schema
     """
     return result
+
 
 @router.get(
     "/selected/chart",
@@ -95,10 +95,24 @@ async def get_selected_portfolio_chart(
 ):
     """
     Endpoint to get selected portfolio over user
-    :param portfolio_id: portfolio id
     :return: portfolio extended schema
     """
     return Response(content=image_bytes, media_type="image/png")
+
+
+@router.get(
+    "/selected/sentiment",
+    status_code=status.HTTP_200_OK,
+    response_model=schemas.SentimentScore,
+)
+async def get_selected_portfolio_sentiment_score(
+        result: schemas.SentimentScore = Depends(dependencies.get_sentiment_score)
+):
+    """
+    Endpoint to get selected portfolio over user
+    :return: portfolio extended schema
+    """
+    return result
 
 
 @router.delete(

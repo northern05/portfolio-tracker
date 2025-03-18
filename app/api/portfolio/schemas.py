@@ -28,8 +28,11 @@ class PortfolioResponseExtended(PortfolioBase):
     related_news: str | None = None
     price_movements: str | None = None
     investment_landscape: str | None = None
-    sentiment_score: str | None = None
     current_price: dict | None = None
+
+
+class SentimentScore(BaseModel):
+    sentiment_score: str
 
 
 class ConnectTelegram(BaseModel):

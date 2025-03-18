@@ -10,7 +10,7 @@ from app.core.errors import errors
 from app.core.models import db_helper, User
 from . import crud
 from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, PortfolioResponseExtended, \
-    ConnectTelegram
+    ConnectTelegram, SentimentScore
 from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver, chatgpt
 from utils.general import create_crypto_sentiment_chart
 from utils import prompts
@@ -73,6 +73,28 @@ async def get_selected_portfolio(
     return response_data
 
 
+async def get_sentiment_score(
+        symbol: Annotated[str, Path],
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+
+) -> SentimentScore:
+    portfolio = await crud.get_by_symbol(session=session, symbol=symbol)
+    cash_data = await redis_db.get(f"{portfolio.symbol}_sentiment")
+    if cash_data:
+        return SentimentScore.parse_obj(json.loads(cash_data.decode("UTF-8")))
+    if not portfolio:
+        await session.close()
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=errors.portfolio_errors.PROJECT_NOT_FOUND
+        )
+    sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
+    response_data = SentimentScore(
+        sentiment_score=chatgpt.post_llama(symbol=symbol, post_data=sentiment_score).removesuffix("</s>"))
+    await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
+    return response_data
+
+
 async def create_report(
         symbol: str,
         full_token_name: str,
@@ -83,7 +105,7 @@ async def create_report(
         for k, v in block.items():
             perplexity_result = perplexity_driver.chat_without_streaming(
                 message=v.get("msg") % (
-                symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
+                    symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
                 prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
             )
             chatgpt_processing = chatgpt.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))

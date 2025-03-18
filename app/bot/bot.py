@@ -80,7 +80,7 @@ async def on_startup(bot: Bot):
 async def set_bot_commands(bot: Bot):
     commands = [
         types.BotCommand(command="start", description="Start the bot"),
-        # types.BotCommand(command="add_wallet", description="Add your crypto wallet"),
+        types.BotCommand(command="add_coin", description="Add your asset to your portfolio"),
         types.BotCommand(command="my_portfolio", description="View your portfolio"),
         types.BotCommand(command="get_report_menu", description="Get a 7-day report for a coin"),
         types.BotCommand(command="help", description="Show help menu")
@@ -93,7 +93,7 @@ async def show_commands(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="📌 Start", callback_data="cmd_start")],
-            # [InlineKeyboardButton(text="💼 Add Wallet", callback_data="cmd_add_wallet")],
+            [InlineKeyboardButton(text="💼 Add COIN", callback_data="cmd_add_coin")],
             [InlineKeyboardButton(text="📊 View Portfolio", callback_data="cmd_my_portfolio")],
             [InlineKeyboardButton(text="📉 Get Report", callback_data="cmd_get_report")],
             [InlineKeyboardButton(text="ℹ️ Help", callback_data="cmd_help")]
@@ -106,7 +106,7 @@ async def show_commands(message: types.Message):
 async def handle_command_callback(callback: types.CallbackQuery):
     command_map = {
         "cmd_start": "/start - Start the bot",
-        # "cmd_add_wallet": "/add_wallet - Add your crypto wallet",
+        "cmd_add_coin": "/add_coin - Add asset to your portfolio",
         "cmd_my_portfolio": "/my_portfolio - View your portfolio",
         "cmd_get_report": "/get_report_menu - Get a 7-day report for a coin",
         "cmd_help": "/help - Show help message"
@@ -159,7 +159,9 @@ async def process_token(message: types.Message, state: FSMContext):
 
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=[
-            [types.KeyboardButton(text=f"{str(token.get('symbol'))} {format_market_cap(token.get('market_cap'))}$ {token.get('token_id')}")] for
+            [types.KeyboardButton(
+                text=f"{str(token.get('symbol'))} {format_market_cap(token.get('market_cap'))}$ {token.get('token_id')}")]
+            for
             token in similar_tokens],
         resize_keyboard=True,
         one_time_keyboard=True
@@ -295,16 +297,15 @@ async def remove_coin(callback: types.CallbackQuery):
 
     if response.status_code == 202:
         await callback.answer(f"✅ Coin **{coin}** removed!", parse_mode='Markdown')
-        await edit_portfolio_menu(callback.message)
     else:
         await callback.answer("❌ Error removing coin. Please try again.")
+    await edit_portfolio_menu(callback.message)
 
 
 @tg_router.callback_query(F.data == "add_coin")
 async def ask_new_coins(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(PortfolioState.choosing_coin)
     await callback.message.answer("Enter new coins (for example, BTC ETH SOL):")
-    await callback.answer()
 
 
 @tg_router.callback_query(F.data.startswith("get_report_"))
@@ -329,7 +330,6 @@ async def get_report(callback: types.CallbackQuery):
         os.remove(image_path)
     else:
         await callback.message.answer("❌ Failed to generate the chart. Try again later.")
-        return
 
     # Fetch additional data (News & Price)
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
@@ -339,18 +339,22 @@ async def get_report(callback: types.CallbackQuery):
         price = data.get("current_price", {}).get("price_usd", "N/A")
         price_movements = data.get("price_movements", "No news available.")
         investment_landscape = data.get("investment_landscape", "No news available.")
-        sentiment_score = data.get("sentiment_score", "No news available.")
-
         # ✅ Send news & price separately
         await callback.message.answer(f"📰 {news}", parse_mode='Markdown')
         await callback.message.answer(f"📈 {price_movements}", parse_mode='Markdown')
         await callback.message.answer(f"🌐 {investment_landscape}", parse_mode='Markdown')
-        await callback.message.answer(f"📊 {sentiment_score}", parse_mode='Markdown')
         await callback.message.answer(f"💰 **Current price:** {round(price, 2)} USD", parse_mode='Markdown')
+
+    response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
+    if response.status_code == 200:
+        data = response.json()
+        sentiment_score = data.get("sentiment_score", "No news available.")
+        await callback.message.answer(f"📊 {sentiment_score}", parse_mode='Markdown')
+
         await callback.message.answer("Maybe I can help you more?")
-        await edit_portfolio_menu(callback.message)
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
+    await edit_portfolio_menu(callback.message)
 
 
 @tg_router.callback_query(F.data.startswith("get_total_report"))
