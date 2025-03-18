@@ -1,23 +1,47 @@
 prompts = [{"news": {
-    "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between 08.03.2025 and 16.03.2025. Ensure the target the event occurrence dates (not the publication dates). Include language-agnostic keywords since all languages should be accepted (non-English articles will later be translated to English)",
-    "chatgpt_prompt": "",
-    "title": ""
+    "perplexity_prompt": "retrieve news about the crypto asset %s, %s, %s focusing on events that occurred between %s and %s."
+                         "Ensure the target the event occurrence dates (not the publication dates). "
+                         "Include language-agnostic keywords since all languages should be accepted (non-English articles will later be translated to English)",
+    "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### **News** [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].",
+    "msg": """General News & Major Events:
+        Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
+        Ensure the focus is on event occurrence dates, that occurred between %s and %s. .
+        Please return only high-quality sources. If any content is behind paywalls, summarize key points.""",
+    "title": "News"
 },
     "price_movements": {
         "perplexity_prompt": """
-        Find news articles about past price movements:
-        - within 08.03.2025 and 16.03.2025 date range
-        - excluding any predictions or forecasts
-        - show me all links when you get information""",
-        "chatgpt_prompt": "",
-        "title": ""
+            Find news articles about past price movements for %s:
+            - within %s and %s date range
+            - excluding any predictions or forecasts
+            - show me all links when you get information""",
+        "msg": """Price Movements & Market Trends:
+            Identify articles discussing past price movements and volatility for %s, %s, %s that occurred between %s and %s.
+            Exclude any predictions or speculative forecasts.
+            Please return only high-quality sources. If any content is behind paywalls, summarize key points.""",
+        "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### **Price Moves** [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].",
+        "title": "Price Moves"
     },
-    "investment landscape": {
+    "investment_landscape": {
         "perplexity_prompt": """
-        Find news articles about investment landscape and ecosystem updates:
-        - within 08.03.2025 and 16.03.2025 date range
-        - show me all links when you get information""",
-        "chatgpt_prompt": "",
-        "title": ""
+            Find news articles about investment landscape and ecosystem updates for %s:
+            - within %s and %s date range
+            - show me all links when you get information""",
+        "msg": """Investment & Ecosystem Updates:
+            Retrieve news related to market adoption, investor sentiment, and ecosystem developments (e.g., institutional interest, major token listings, DeFi integrations) for %s, %s, %s that occurred between %s and %s.
+            Please return only high-quality sources. If any content is behind paywalls, summarize key points.""",
+        "chatgpt_prompt": """all this news should be drawn up in the form of a template report and duplicates should be removed. news other than the Investment Landscape should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### **Investment Landscape** [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].""",
+        "title": "Investment Landscape"
     }
 }]
+
+keywords = f"""
+            Language-agnostic keywords for searching related news include:
+            - **Cryptocurrency**
+            - **Blockchain**
+            - **Market Trends**
+            - **Whale Activity**
+            - **Futures Launch**
+            """
+
+final_prompt = ""

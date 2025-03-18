@@ -1,4 +1,5 @@
 import io
+from datetime import datetime, timedelta
 import json
 from typing import Annotated
 from fastapi import Path, Depends, HTTPException, status
@@ -12,6 +13,7 @@ from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, 
     ConnectTelegram
 from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver, chatgpt
 from utils.general import create_crypto_sentiment_chart
+from utils import prompts
 from app.core.modules_factory import redis_db
 
 
@@ -58,10 +60,11 @@ async def get_selected_portfolio(
         )
     response_data = PortfolioResponseExtended.from_orm(portfolio)
     response_data.current_price = cmc_driver.get_current_token_price(symbol=portfolio.symbol)
-    full_token_name = coin_gecko_driver.get_token_name(symbol=portfolio.symbol)
-    response_data.related_news = perplexity_driver.chat_without_streaming(
+    full_token_name = coin_gecko_driver.get_token_name(symbol=portfolio.symbol, token_id=portfolio.coingecko_id)
+    response_data = await create_report(
         symbol=portfolio.symbol,
         full_token_name=full_token_name,
+        data=response_data,
         twitter=portfolio.twitter
     )
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
@@ -69,6 +72,22 @@ async def get_selected_portfolio(
     response_data.sentiment_score = result
     await redis_db.set(portfolio.symbol, response_data.json(), ex=86400)
     return response_data
+
+
+async def create_report(
+        symbol: str,
+        full_token_name: str,
+        data: PortfolioResponseExtended,
+        twitter: str = None
+):
+    for block in prompts.prompts:
+        for k, v in block.items():
+            getattr(data, k, perplexity_driver.chat_without_streaming(
+                message=v.get("msg") % (
+                symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
+                prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
+            ))
+    return data
 
 
 async def get_selected_portfolio_chart(

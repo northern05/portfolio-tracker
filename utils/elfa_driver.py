@@ -13,18 +13,22 @@ class ElfaDriver:
         return bool(re.search(pattern, post_text, re.IGNORECASE))
 
     def get_squeeze(self, symbol: str):
-        all_tickers = [f"${symbol}", f"#{symbol}", symbol]
+        all_tickers = [f"${symbol}", f"%23{symbol}", symbol]
         tweets = []
         for ticker in all_tickers:
             result = self.get_top_posts(symbol=ticker)
             tweets.extend(result)
 
-        filtered_tweets = [tweet for tweet in tweets if self.is_valid_ticker(tweet["content"], symbol)]
+        # Remove duplicates based on 'content'
+        unique_tweets = {tweet["content"]: tweet for tweet in tweets}.values()
+        # Filter tweets that match the symbol criteria
+        filtered_tweets = [tweet for tweet in unique_tweets if self.is_valid_ticker(tweet["content"], symbol)]
+
         return filtered_tweets
 
     def get_top_posts(self, symbol: str, time_window: str = "7d", page: int = 1,
                       page_size: int = 50):
-        url = f'{self.ELFA_URL}/top-mentions?ticker=${symbol}&timeWindow={time_window}&page={page}&pageSize={page_size}'
+        url = f'{self.ELFA_URL}/top-mentions?ticker={symbol}&timeWindow={time_window}&page={page}&pageSize={page_size}'
         headers = {
             'x-elfa-api-key': self.ELFA_API_KEY
         }
@@ -67,4 +71,5 @@ class ElfaDriver:
 
 
 if __name__ == '__main__':
-    print(get_top_posts('solana', time_window=PostsTimeWindow.WEEKLY))
+    elfa = ElfaDriver()
+    print(elfa.get_squeeze(symbol="MKR"))
