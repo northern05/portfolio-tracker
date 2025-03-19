@@ -147,7 +147,7 @@ async def get_selected_portfolio_chart(
 async def get_similar_assets(
         asset_symbol: str,
         token_id: str = None
-) -> list[SimilarAssetsResponse]:
+) -> list[SimilarAssetsResponse] | SimilarAssetsResponse:
     similar_assets = coin_gecko_driver.get_similar_tokens(symbol=asset_symbol)
     result = [SimilarAssetsResponse.from_orm(asset) for asset in similar_assets]
     if token_id:
