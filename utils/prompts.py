@@ -54,7 +54,7 @@ Duplicate news was removed, leaving only one
 ###Output Format###
 Price Moves
 <content> / up to 2 sentences
-Updates (do not include any data about price moves here)
+Updates (do not include any data about price moves here, only Investment & Ecosystem Updates and General News & Major Events)
 <1. updates> / up to 2 sentences per each news
 <2. updates> / up to 2 sentences per each news
 <3. updates> / up to 2 sentences per each news
