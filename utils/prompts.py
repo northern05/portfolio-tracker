@@ -50,4 +50,13 @@ final_prompt = """Please generate a unified report that combines the following t
 Ensure that each section includes the corresponding URL to its original source. 
 Format the report with clear headings for each section, and present the information in a concise and informative manner.
 Information should not be repeated, if it is repeated, then decide which block it is closer to and leave it only in it. 
-Duplicate news was removed, leaving only one"""
+Duplicate news was removed, leaving only one
+###Output Format###
+Price Moves
+<content> / up to 2 sentences
+Updates (do not include any data about price moves here)
+<1. updates> / up to 2 sentences per each news
+<2. updates> / up to 2 sentences per each news
+<3. updates> / up to 2 sentences per each news
+<4. updates> / up to 2 sentences per each news
+<5. updates> / up to 2 sentences per each news"""

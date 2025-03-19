@@ -89,7 +89,7 @@ async def get_sentiment_score(
         )
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
     response_data = SentimentScore(
-        sentiment_score=llama.send_message(symbol=symbol, post_data=sentiment_score).removesuffix("</s>").replace('\n',
+        sentiment_score=llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score).removesuffix("</s>").replace('\n',
                                                                                                                   ' \n '))
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
@@ -120,7 +120,7 @@ async def generate_full_report(
     Price Movements & Market Trends: {data.price_movements}, 
     Investment & Ecosystem Updates: {data.investment_landscape}. 
     Please generate a unified report that combines the following three news sections into a cohesive narrative."""
-    data.full_report = llama.send_message(message=message, prompt=prompts.final_prompt)
+    data.full_report = llama.send_message(message=message, prompt=prompts.final_prompt).removesuffix("</s>")
     return data
 
 
