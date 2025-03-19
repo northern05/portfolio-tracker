@@ -11,7 +11,7 @@ from app.core.models import db_helper
 from . import crud
 from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, PortfolioResponseExtended, \
     ConnectTelegram, SentimentScore
-from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver, chatgpt, redis_db, \
+from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver, redis_db, \
     llama
 from utils.general import create_crypto_sentiment_chart
 from utils import prompts
@@ -89,7 +89,7 @@ async def get_sentiment_score(
         )
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
     response_data = SentimentScore(
-        sentiment_score=chatgpt.post_llama(symbol=symbol, post_data=sentiment_score).removesuffix("</s>").replace('\n',
+        sentiment_score=llama.send_message(symbol=symbol, post_data=sentiment_score).removesuffix("</s>").replace('\n',
                                                                                                                   ' \n '))
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
