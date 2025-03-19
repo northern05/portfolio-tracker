@@ -88,7 +88,8 @@ async def get_sentiment_score(
             detail=errors.portfolio_errors.PROJECT_NOT_FOUND
         )
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
-    response_data = SentimentScore(sentiment_score=llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score))
+    bullish, fud = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score)
+    response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
 

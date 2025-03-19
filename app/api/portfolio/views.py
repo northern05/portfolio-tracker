@@ -1,5 +1,7 @@
 import logging
 from fastapi import APIRouter, status, Depends, Response
+from fastapi.responses import FileResponse
+from pathlib import Path
 
 from . import dependencies, schemas
 
@@ -127,3 +129,9 @@ async def delete_portfolio(
     :return: portfolio extended schema
     """
     return result
+
+
+@router.get("/get-gif", response_class=FileResponse)
+async def get_gif():
+    gif_path = Path("gif_waiting.gif")
+    return gif_path

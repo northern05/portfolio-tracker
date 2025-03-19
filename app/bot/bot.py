@@ -27,6 +27,7 @@ TOKEN: str = os.environ.get('TG_TOKEN', "7540334723:AAFGudo28Myy4ltPmZLz3jhODPY4
 API_URL: str = os.environ.get('BASE_SITE', "https://api.agent.zpoken.dev/portfolio_tracker/api/v1/portfolio")
 API_KEY: str = os.environ.get('TG_API_KEY', "tg_api_key")
 MAX_BUTTONS_PER_MESSAGE = 10
+GIF_URL: str = "https://api.agent.zpoken.dev/portfolio_tracker/api/v1/portfolio/get-gif"
 
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='Markdown'))
 dp = Dispatcher()
@@ -314,7 +315,7 @@ async def get_report(callback: types.CallbackQuery):
 
     # ✅ Immediately acknowledge the callback query to prevent timeout
     await callback.answer("📊 Generating report, please wait...", show_alert=False)
-
+    processing_message = await callback.message.answer_animation(animation=GIF_URL, caption="Processing your request...")
     # Fetch chart image
     response = requests.get(f"{API_URL}/selected/chart", params={"symbol": coin})
     if response.status_code == 200:
@@ -338,7 +339,9 @@ async def get_report(callback: types.CallbackQuery):
         news = data.get("full_report", "No news available.")
         price = data.get("current_price", {}).get("price_usd", "N/A")
         # ✅ Send news & price separately
-        await callback.message.answer(f"📰 {news}", parse_mode='Markdown')
+        await bot.edit_message_caption(chat_id=processing_message.chat.id,
+                                       message_id=processing_message.message_id,
+                                       caption=f"📰 {news}", parse_mode='Markdown')
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:

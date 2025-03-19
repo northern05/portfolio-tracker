@@ -33,7 +33,8 @@ class PortfolioResponseExtended(PortfolioBase):
 
 
 class SentimentScore(BaseModel):
-    sentiment_score: str
+    bullish: str
+    fud: str
 
 
 class ConnectTelegram(BaseModel):

@@ -16,11 +16,15 @@ class LlamaDriver:
         self.bullish = """1. #### *Top Bullish Post:*
                 - Identify the most engaging bullish post (highest likes/comments/shares) that reflects strong positive sentiment.
                 Don't make summarizing and drop any summarizing if exists.
-                Highlight text headings according to telegram's Markdown with *."""
+                Highlight text headings according to telegram's Markdown with *.
+                DO NOT GENERATE any statistics.
+                ONLY POSITIVE POST."""
         self.fud = """2. #### **Top FUD/Negative Post:**
                 - Identify the most engaging FUD/negative post that reflects concerns, fear, or uncertainty.
                 Don't make summarizing and drop any summarizing if exists.
-                Highlight text headings according to telegram's Markdown with *."""
+                Highlight text headings according to telegram's Markdown with *.
+                DO NOT GENERATE any statistics.
+                ONLY NEGATIVE POST"""
 
 
     def send_message(self, message: str, prompt: str):
@@ -39,13 +43,13 @@ class LlamaDriver:
             return None
 
     def get_bullish_fud(self, symbol: str, post_data: dict):
-        result = {}
         message = f"""Parse X posts which i add in posts data with ${symbol.upper()}.
                 Posts data: {post_data}
                 Don't use "Based on your provided data, here is the requested analysis:"
                 don't use the description of the analysis method
                 Don't make summarizing and drop any summarizing if exists.
-                don't add Note or another comments, only twitter posts
+                Don't add Note or another comments, only twitter posts.
+                DO NOT GENERATE any statistics, Only post
                 RETURN as a template:"""
 
         data = {"prompt": f"{self.analize_prompt} {self.bullish}", "msg": message}
@@ -54,13 +58,10 @@ class LlamaDriver:
             bullish = response.json().get("response").removesuffix("</s>").replace('\n',' \n ')
         else:
             bullish = "error result"
-        result.update({"bullish": bullish})
-
         data = {"prompt": f"{self.analize_prompt} {self.fud}", "msg": message}
         response = requests.post(url=self.BASE_URL, json=data)
         if response.status_code == 200:
             fud = response.json().get("response").removesuffix("</s>").replace('\n',' \n ')
         else:
             fud = "error result"
-        result.update({"fud": fud})
-        return result
+        return bullish, fud
