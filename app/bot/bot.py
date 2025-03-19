@@ -335,14 +335,10 @@ async def get_report(callback: types.CallbackQuery):
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
-        news = data.get("related_news", "No news available.")
+        news = data.get("full_report", "No news available.")
         price = data.get("current_price", {}).get("price_usd", "N/A")
-        price_movements = data.get("price_movements", "No news available.")
-        investment_landscape = data.get("investment_landscape", "No news available.")
         # ✅ Send news & price separately
         await callback.message.answer(f"📰 {news}", parse_mode='Markdown')
-        await callback.message.answer(f"📈 {price_movements}", parse_mode='Markdown')
-        await callback.message.answer(f"🌐 {investment_landscape}", parse_mode='Markdown')
         await callback.message.answer(f"💰 **Current price:** {round(price, 2)} USD", parse_mode='Markdown')
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
