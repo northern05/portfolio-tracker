@@ -67,7 +67,7 @@ async def get_selected_portfolio(
         data=response_data,
         twitter=portfolio.twitter
     )
-    response_data.full_report = await generate_full_report(data=response_data)
+    response_data = await generate_full_report(data=response_data)
     await redis_db.set(portfolio.symbol, response_data.json(), ex=86400)
     return response_data
 
