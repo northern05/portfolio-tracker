@@ -51,16 +51,16 @@ class LlamaDriver:
         data = {"prompt": f"{self.analize_prompt} {self.bullish}", "msg": message}
         response = requests.post(url=self.BASE_URL, json=data)
         if response.status_code == 200:
-            bullish = {"bullish": response.json().get("response")}
+            bullish = response.json().get("response").removesuffix("</s>").replace('\n',' \n ')
         else:
-            bullish = {"error": "error result"}
+            bullish = "error result"
         result.update({"bullish": bullish})
 
         data = {"prompt": f"{self.analize_prompt} {self.fud}", "msg": message}
         response = requests.post(url=self.BASE_URL, json=data)
         if response.status_code == 200:
-            fud = {"bullish": response.json().get("response")}
+            fud = response.json().get("response").removesuffix("</s>").replace('\n',' \n ')
         else:
-            fud = {"error": "error result"}
-        result.update({"bullish": fud})
+            fud = "error result"
+        result.update({"fud": fud})
         return result

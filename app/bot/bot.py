@@ -330,7 +330,7 @@ async def get_report(callback: types.CallbackQuery):
         os.remove(image_path)
     else:
         await callback.message.answer("❌ Failed to generate the chart. Try again later.")
-
+    price = 0
     # Fetch additional data (News & Price)
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
@@ -339,17 +339,18 @@ async def get_report(callback: types.CallbackQuery):
         price = data.get("current_price", {}).get("price_usd", "N/A")
         # ✅ Send news & price separately
         await callback.message.answer(f"📰 {news}", parse_mode='Markdown')
-        await callback.message.answer(f"💰 **Current price:** {round(price, 2)} USD", parse_mode='Markdown')
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
         sentiment_score = data.get("sentiment_score", "No news available.")
-        await callback.message.answer(f"📊 {sentiment_score}", parse_mode='Markdown')
-
-        await callback.message.answer("Maybe I can help you more?")
+        bullish = sentiment_score.get('bullish')
+        fud = sentiment_score.get('fud')
+        await callback.message.answer(f"📊 X/Twitter: \n {bullish} \n {fud}", parse_mode='Markdown')
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
+    await callback.message.answer(f"💰 *Current price:* {round(price, 2)} USD", parse_mode='Markdown')
+    await callback.message.answer("Maybe I can help you more?")
     await edit_portfolio_menu(callback.message)
 
 
