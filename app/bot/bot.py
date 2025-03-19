@@ -315,7 +315,6 @@ async def get_report(callback: types.CallbackQuery):
 
     # ✅ Immediately acknowledge the callback query to prevent timeout
     await callback.answer("📊 Generating report, please wait...", show_alert=False)
-    processing_message = await callback.message.answer_animation(animation=GIF_URL, caption="Processing your request...")
     # Fetch chart image
     response = requests.get(f"{API_URL}/selected/chart", params={"symbol": coin})
     if response.status_code == 200:
@@ -332,6 +331,8 @@ async def get_report(callback: types.CallbackQuery):
     else:
         await callback.message.answer("❌ Failed to generate the chart. Try again later.")
     price = 0
+    processing_message = await callback.message.answer_animation(animation=GIF_URL,
+                                                                 caption="Processing your request...")
     # Fetch additional data (News & Price)
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
@@ -339,17 +340,21 @@ async def get_report(callback: types.CallbackQuery):
         news = data.get("full_report", "No news available.")
         price = data.get("current_price", {}).get("price_usd", "N/A")
         # ✅ Send news & price separately
-        await bot.edit_message_caption(chat_id=processing_message.chat.id,
-                                       message_id=processing_message.message_id,
-                                       caption=f"📰 {news}", parse_mode='Markdown')
+        await bot.delete_message(
+            chat_id=processing_message.chat.id,
+            message_id=processing_message.message_id
+        )
+
+        await callback.message.answer(f"📰 *News by {coin}:* \n{news}", parse_mode='Markdown')
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
-        sentiment_score = data.get("sentiment_score", "No news available.")
-        bullish = sentiment_score.get('bullish')
-        fud = sentiment_score.get('fud')
-        await callback.message.answer(f"📊 X/Twitter: \n {bullish} \n {fud}", parse_mode='Markdown')
+        bullish = data.get('bullish')
+        fud = data.get('fud')
+        await callback.message.answer(f"📊 X/Twitter:", parse_mode='Markdown')
+        await callback.message.answer(f"\n {bullish}", parse_mode='Markdown')
+        await callback.message.answer(f"\n {fud}", parse_mode='Markdown')
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
     await callback.message.answer(f"💰 *Current price:* {round(price, 2)} USD", parse_mode='Markdown')

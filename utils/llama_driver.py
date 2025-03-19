@@ -19,7 +19,7 @@ class LlamaDriver:
                 Highlight text headings according to telegram's Markdown with *.
                 DO NOT GENERATE any statistics.
                 ONLY POSITIVE POST."""
-        self.fud = """2. #### **Top FUD/Negative Post:**
+        self.fud = """2. #### *Top FUD/Negative Post:*
                 - Identify the most engaging FUD/negative post that reflects concerns, fear, or uncertainty.
                 Don't make summarizing and drop any summarizing if exists.
                 Highlight text headings according to telegram's Markdown with *.
