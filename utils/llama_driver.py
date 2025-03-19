@@ -49,7 +49,8 @@ class LlamaDriver:
                 don't use the description of the analysis method
                 Don't make summarizing and drop any summarizing if exists.
                 Don't add Note or another comments, only twitter posts.
-                DO NOT GENERATE any statistics, Only post
+                DO NOT GENERATE any statistics, metrics, Only post
+                delete metrics and type if exists
                 RETURN as a template:"""
 
         data = {"prompt": f"{self.analize_prompt} {self.bullish}", "msg": message}
