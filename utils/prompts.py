@@ -5,7 +5,7 @@ prompts = [{"related_news": {
     "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *News* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].",
     "msg": """General News & Major Events:
         Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
-        Ensure the focus is on event occurrence dates, that occurred between %s and %s. .
+        Ensure the focus is on event occurrence dates, that occurred between %s and %s.
         Please return only high-quality sources. If any content is behind paywalls, summarize key points.""",
     "title": "News"
 },
@@ -46,4 +46,8 @@ keywords = f"""
             - **Futures Launch**
             """
 
-final_prompt = ""
+final_prompt = """Please generate a unified report that combines the following three news sections into a cohesive narrative. 
+Ensure that each section includes the corresponding URL to its original source. 
+Format the report with clear headings for each section, and present the information in a concise and informative manner.
+Information should not be repeated, if it is repeated, then decide which block it is closer to and leave it only in it. 
+Duplicate news was removed, leaving only one"""

@@ -7,14 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.auth import dependencies as auth_dependencies
 from app.core.errors import errors
-from app.core.models import db_helper, User
+from app.core.models import db_helper
 from . import crud
 from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, PortfolioResponseExtended, \
     ConnectTelegram, SentimentScore
-from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver, chatgpt
+from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver, chatgpt, redis_db, \
+    llama
 from utils.general import create_crypto_sentiment_chart
 from utils import prompts
-from app.core.modules_factory import redis_db
 
 
 async def create_portfolio(
@@ -67,6 +67,7 @@ async def get_selected_portfolio(
         data=response_data,
         twitter=portfolio.twitter
     )
+    response_data.full_report = await generate_full_report(data=response_data)
     await redis_db.set(portfolio.symbol, response_data.json(), ex=86400)
     return response_data
 
@@ -88,7 +89,8 @@ async def get_sentiment_score(
         )
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
     response_data = SentimentScore(
-        sentiment_score=chatgpt.post_llama(symbol=symbol, post_data=sentiment_score).removesuffix("</s>").replace('\n', ' \n '))
+        sentiment_score=chatgpt.post_llama(symbol=symbol, post_data=sentiment_score).removesuffix("</s>").replace('\n',
+                                                                                                                  ' \n '))
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
 
@@ -106,8 +108,19 @@ async def create_report(
                     symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
                 prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
             )
-            chatgpt_processing = chatgpt.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))
+            chatgpt_processing = llama.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))
             setattr(data, k, chatgpt_processing)
+    return data
+
+async def generate_full_report(
+        data: PortfolioResponseExtended,
+):
+    message = f"""There is three blocks with 
+    General News & Major Events: {data.related_news}, 
+    Price Movements & Market Trends: {data.price_movements}, 
+    Investment & Ecosystem Updates: {data.investment_landscape}. 
+    Please generate a unified report that combines the following three news sections into a cohesive narrative."""
+    data.full_report = llama.send_message(message=message, prompt=prompts.final_prompt)
     return data
 
 

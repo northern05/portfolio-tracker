@@ -1,10 +1,12 @@
 from redis.asyncio import Redis
-from app.core.config import config, cmc_config, perplexity_config, elfa_config, redis_config, openai_config
+from app.core.config import config, cmc_config, perplexity_config, elfa_config, redis_config, openai_config, \
+    llama_config
 from utils.cmc_driver import CoinMarketCapDriver
 from utils.perplexity_driver import PerplexityDriver
 from utils.elfa_driver import ElfaDriver
 from utils.coingecko_driver import CryptoPriceFetcher
 from utils.chatGPT_driver import ChatGPTDriver
+from utils.llama_driver import LlamaDriver
 
 # -------- Initialize CoinMarketCap Driver -----------------
 cmc_driver = CoinMarketCapDriver(
@@ -37,3 +39,6 @@ redis_db = Redis(
 
 # -------- Initialize Chat GPT connection --------------------
 chatgpt = ChatGPTDriver(api_key=openai_config.OPENAI_API_KEY)
+
+# -------- Initialize Llama connection --------------------
+llama = LlamaDriver(base_url=llama_config.LLAMA_URL)

@@ -29,6 +29,7 @@ class PortfolioResponseExtended(PortfolioBase):
     price_movements: str | None = None
     investment_landscape: str | None = None
     current_price: dict | None = None
+    full_report: str | None = None
 
 
 class SentimentScore(BaseModel):
