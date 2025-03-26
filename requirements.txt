@@ -79,3 +79,4 @@ pandas
 kaleido
 aiogram
 scipy
+twikit
