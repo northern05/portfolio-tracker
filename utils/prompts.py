@@ -53,7 +53,8 @@ final_prompt = """Please generate a unified report that combines the following t
 Ensure that each section includes the corresponding URL to its original source. 
 Format the report with clear headings for each section, and present the information in a concise and informative manner.
 Information should not be repeated, if it is repeated, then decide which block it is closer to and leave it only in it. 
-Duplicate news was removed, leaving only one
+Duplicate news was removed, leaving only one.
+Squeeze all message maximum to 3500 symbols in message.
 ###Output Format###
 Price Moves
 <content> / up to 1 short sentence
