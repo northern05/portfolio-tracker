@@ -156,14 +156,14 @@ async def get_similar_assets(
 ) -> list[SimilarAssetsResponse] | SimilarAssetsResponse:
     similar_assets = coin_gecko_driver.get_similar_tokens(symbol=asset_symbol)
     result = [SimilarAssetsResponse.from_orm(asset) for asset in similar_assets]
-    if token_id:
-        token = list(filter(lambda x: token_id == x.token_id, result))
-        result = SimilarAssetsResponse.from_orm(token[0])
-        result.twitter = coin_gecko_driver.get_twitter_from_coingecko(token_id=result.token_id)
     coingecko_ids = await crud.get_similar_assets(session=session, symbol=asset_symbol)
     for _id in coingecko_ids:
         data = coin_gecko_driver.get_data_over_coingecko_id(token_id=_id)
         result.insert(0, SimilarAssetsResponse.from_orm(data))
+    if token_id:
+        token = list(filter(lambda x: token_id == x.token_id, result))
+        result = SimilarAssetsResponse.from_orm(token[0])
+        result.twitter = coin_gecko_driver.get_twitter_from_coingecko(token_id=result.token_id)
     return result
 
 
