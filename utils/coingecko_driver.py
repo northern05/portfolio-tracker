@@ -31,7 +31,8 @@ class CryptoPriceFetcher:
 
         # Format response
         historical_data = [
-            {"date": datetime.datetime.utcfromtimestamp(price[0] / 1000).strftime("%Y-%m-%d %H:%M:%S"), "price": price[1]}
+            {"date": datetime.datetime.utcfromtimestamp(price[0] / 1000).strftime("%Y-%m-%d %H:%M:%S"),
+             "price": price[1]}
             for price in prices
         ]
 
@@ -50,16 +51,29 @@ class CryptoPriceFetcher:
 
         return coin["id"] if coin else None
 
-    def get_token_name(self, symbol: str, token_id: str):
+    def get_data_over_coingecko_id(self, token_id: str):
         """Fetches the full token name from CoinGecko by its symbol, prioritizing well-known tokens."""
-        url = f"{self.BASE_URL}/coins/{token_id}"
-        response = requests.get(url)
+        try:
+            url = f"{self.BASE_URL}/coins/{token_id}"
+            response = requests.get(url)
+        except Exception as e:
+            url = f"{self.BASE_URL}/search/{token_id}"
+            params = {"query": token_id}
+            response = requests.get(url=url, params=params)
 
         if response.status_code == 200:
             data = response.json()
+            market_cup = data["market_cap"] if data.get("market_cap") else data.get("market_data").get("market_cap").get("usd")
 
+            result = {
+                "token_id": data["id"],
+                "name": data["name"],
+                "symbol": data["symbol"].upper(),
+                "market_cap": market_cup,
+                "image_url": data.get("image").get("thumb")
+            }
             # Return the first found token if no special case (like ETH)
-            return data["name"]
+            return result
 
         return "Error fetching data from CoinGecko."
 
@@ -72,7 +86,7 @@ class CryptoPriceFetcher:
             twitter_url = data.get("links", {}).get("twitter_screen_name")
 
             if twitter_url:
-                return f"https://twitter.com/{twitter_url}"
+                return f"https://x.com/{twitter_url}"
             else:
                 return None
         else:

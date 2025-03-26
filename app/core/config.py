@@ -44,6 +44,12 @@ class PerplexitySettings(BaseSettings):
     PERPLEXITY_API_KEY: str = os.environ.get("PERPLEXITY_API_KEY")
 
 
+class TwitterCredentialsSettings(BaseSettings):
+    TWITTER_USERNAME: str = os.environ.get("TWITTER_USERNAME")
+    TWITTER_EMAIL: str = os.environ.get("TWITTER_EMAIL")
+    TWITTER_PASSWORD: str = os.environ.get("TWITTER_PASSWORD")
+
+
 class OpenAISettings(BaseSettings):
     OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY")
 
@@ -60,3 +66,4 @@ perplexity_config = PerplexitySettings()
 redis_config = RedisSettings()
 openai_config = OpenAISettings()
 llama_config = LLamaSettings()
+twitter_account_config = TwitterCredentialsSettings()

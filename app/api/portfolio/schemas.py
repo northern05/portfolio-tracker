@@ -30,6 +30,7 @@ class PortfolioResponseExtended(PortfolioBase):
     investment_landscape: str | None = None
     current_price: dict | None = None
     full_report: str | None = None
+    twitter_news: str | None = None
 
 
 class SentimentScore(BaseModel):

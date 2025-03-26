@@ -71,5 +71,5 @@ class ElfaDriver:
 
 
 if __name__ == '__main__':
-    elfa = ElfaDriver()
+    elfa = ElfaDriver(base_url="https://api.elfa.ai/v1", api_key="elfak_db1eb0fe5cadbee7f798e2f79f5c53b8bfddb7d5")
     print(elfa.get_squeeze(symbol="MKR"))

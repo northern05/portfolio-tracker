@@ -6,7 +6,8 @@ prompts = [{"related_news": {
     "msg": """General News & Major Events:
         Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
         Ensure the focus is on event occurrence dates, that occurred between %s and %s.
-        Please return only high-quality sources. If any content is behind paywalls, summarize key points.""",
+        Please return only high-quality sources. If any content is behind paywalls, summarize key points.
+        [Source links at the end].""",
     "title": "News"
 },
     "price_movements": {
@@ -19,7 +20,8 @@ prompts = [{"related_news": {
         "msg": """Price Movements & Market Trends:
             Identify articles discussing past price movements and volatility for %s, %s, %s that occurred between %s and %s.
             Exclude any predictions or speculative forecasts.
-            Please return only high-quality sources. If any content is behind paywalls, summarize key points.""",
+            Please return only high-quality sources. If any content is behind paywalls, summarize key points.
+            [Source links at the end].""",
         "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *Price Moves* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].",
         "title": "Price Moves"
     },
@@ -31,7 +33,8 @@ prompts = [{"related_news": {
             - [Source links at the end]""",
         "msg": """Investment & Ecosystem Updates:
             Retrieve news related to market adoption, investor sentiment, and ecosystem developments (e.g., institutional interest, major token listings, DeFi integrations) for %s, %s, %s that occurred between %s and %s.
-            Please return only high-quality sources. If any content is behind paywalls, summarize key points.""",
+            Please return only high-quality sources. If any content is behind paywalls, summarize key points.
+            [Source links at the end].""",
         "chatgpt_prompt": """all this news should be drawn up in the form of a template report and duplicates should be removed. news other than the Investment Landscape should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *Investment Landscape* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].""",
         "title": "Investment Landscape"
     }
@@ -53,10 +56,18 @@ Information should not be repeated, if it is repeated, then decide which block i
 Duplicate news was removed, leaving only one
 ###Output Format###
 Price Moves
-<content> / up to 2 sentences
+<content> / up to 1 short sentence
 Updates (do not include any data about price moves here, only Investment & Ecosystem Updates and General News & Major Events)
-<1. updates> / up to 2 sentences per each news
-<2. updates> / up to 2 sentences per each news
-<3. updates> / up to 2 sentences per each news
-<4. updates> / up to 2 sentences per each news
-<5. updates> / up to 2 sentences per each news"""
+<1. updates> / up to 1 short sentences per each news
+<2. updates> / up to 1 short sentences per each news
+<3. updates> / up to 1 short sentences per each news
+Save all sources and links in the end of the message
+[Source links at the end].
+"""
+
+twikit_prompt = """
+Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
+Identify mentions of cryptocurrency price updates, engagement levels (likes/retweets), and sentiment shifts. 
+Highlight any significant events or announcements. Also, summarize how the cryptocurrency community is reacting based on engagement metrics.
+Answer in one short sentence.
+"""

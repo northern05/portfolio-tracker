@@ -12,7 +12,7 @@ from . import crud
 from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, PortfolioResponseExtended, \
     ConnectTelegram, SentimentScore
 from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver, redis_db, \
-    llama
+    llama, twitter_scraper
 from utils.general import create_crypto_sentiment_chart
 from utils import prompts
 
@@ -60,7 +60,7 @@ async def get_selected_portfolio(
         )
     response_data = PortfolioResponseExtended.from_orm(portfolio)
     response_data.current_price = cmc_driver.get_current_token_price(symbol=portfolio.symbol)
-    full_token_name = coin_gecko_driver.get_token_name(symbol=portfolio.symbol, token_id=portfolio.coingecko_id)
+    full_token_name = coin_gecko_driver.get_data_over_coingecko_id(token_id=portfolio.coingecko_id).get("name")
     response_data = await create_report(
         symbol=portfolio.symbol,
         full_token_name=full_token_name,
@@ -107,9 +107,13 @@ async def create_report(
                     symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
                 prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
             )
-            chatgpt_processing = llama.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))
-            setattr(data, k, chatgpt_processing)
+            llama_processing = llama.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))
+            setattr(data, k, llama_processing)
+    twitts_over_asset = twitter_scraper.fetch_tweets(protocol_name=twitter.split("/")[-1])
+    msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {twitts_over_asset}"
+    data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt)
     return data
+
 
 async def generate_full_report(
         data: PortfolioResponseExtended,
@@ -118,6 +122,7 @@ async def generate_full_report(
     General News & Major Events: {data.related_news}, 
     Price Movements & Market Trends: {data.price_movements}, 
     Investment & Ecosystem Updates: {data.investment_landscape}. 
+    Twitter news: {data.twitter_news}
     Please generate a unified report that combines the following three news sections into a cohesive narrative."""
     data.full_report = llama.send_message(message=message, prompt=prompts.final_prompt).removesuffix("</s>")
     return data
@@ -146,7 +151,8 @@ async def get_selected_portfolio_chart(
 
 async def get_similar_assets(
         asset_symbol: str,
-        token_id: str = None
+        token_id: str = None,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
 ) -> list[SimilarAssetsResponse] | SimilarAssetsResponse:
     similar_assets = coin_gecko_driver.get_similar_tokens(symbol=asset_symbol)
     result = [SimilarAssetsResponse.from_orm(asset) for asset in similar_assets]
@@ -154,6 +160,10 @@ async def get_similar_assets(
         token = list(filter(lambda x: token_id == x.token_id, result))
         result = SimilarAssetsResponse.from_orm(token[0])
         result.twitter = coin_gecko_driver.get_twitter_from_coingecko(token_id=result.token_id)
+    coingecko_ids = await crud.get_similar_assets(session=session, symbol=asset_symbol)
+    for _id in coingecko_ids:
+        data = coin_gecko_driver.get_data_over_coingecko_id(token_id=_id)
+        result.insert(0, SimilarAssetsResponse.from_orm(data))
     return result
 
 

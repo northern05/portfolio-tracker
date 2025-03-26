@@ -96,3 +96,16 @@ async def delete_users_portfolio(
     await session.delete(portfolio)
     await session.commit()
     return True
+
+
+async def get_similar_assets(
+        session: AsyncSession,
+        symbol: str
+):
+    stmt = (
+        select(Portfolio.coingecko_id)
+        .filter(func.lower(Portfolio.symbol).ilike(f'%{symbol.lower()}%'))
+    )
+    result: Result = await session.execute(stmt)
+    portfolios = result.scalars().all()
+    return portfolios
