@@ -339,6 +339,7 @@ async def get_report(callback: types.CallbackQuery):
         data = response.json()
         news = data.get("full_report", "No news available.")
         price = data.get("current_price", {}).get("price_usd", "N/A")
+        twitter_news = data.get("twitter_news")
         # ✅ Send news & price separately
         await bot.delete_message(
             chat_id=processing_message.chat.id,
@@ -346,6 +347,7 @@ async def get_report(callback: types.CallbackQuery):
         )
 
         await callback.message.answer(f"📰 *News by {coin}:* \n{news}", parse_mode='Markdown')
+        await callback.message.answer(f"Twitter news: \n {twitter_news}")
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:
