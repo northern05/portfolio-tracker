@@ -109,9 +109,9 @@ async def create_report(
             )
             llama_processing = llama.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))
             setattr(data, k, llama_processing)
-    twitts_over_asset = twitter_scraper.fetch_tweets(protocol_name=twitter.split("/")[-1])
+    twitts_over_asset = await twitter_scraper.fetch_tweets(protocol_name=twitter.split("/")[-1])
     msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {twitts_over_asset}"
-    data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt)
+    data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt).removesuffix("</s>")
     return data
 
 

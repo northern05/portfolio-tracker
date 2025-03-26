@@ -12,10 +12,7 @@ class TwitterScraper:
         self.password = password
         self.min_tweets = min_tweets
         self.client = Client(language="en-US")
-
-    async def setup(self):
-        """Perform async login after object creation."""
-        await self.login()
+        self.login_state = False
 
     async def login(self):
         """Authenticate and store session cookies."""
@@ -41,6 +38,8 @@ class TwitterScraper:
         return user.id
 
     async def fetch_tweets(self, protocol_name: str):
+        if not self.login_state:
+            await self.login()
         tweet_data = []
         tweets = None
         while True:
