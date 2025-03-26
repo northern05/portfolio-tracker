@@ -18,13 +18,15 @@ class LlamaDriver:
                 Don't make summarizing and drop any summarizing if exists.
                 Highlight text headings according to telegram's Markdown with *.
                 DO NOT GENERATE any statistics.
-                ONLY POSITIVE POST."""
+                ONLY POSITIVE POST.
+                IF its to large - reduce it to one sentence."""
         self.fud = """2. #### *Top FUD/Negative Post:*
                 - Identify the most engaging FUD/negative post that reflects concerns, fear, or uncertainty.
                 Don't make summarizing and drop any summarizing if exists.
                 Highlight text headings according to telegram's Markdown with *.
                 DO NOT GENERATE any statistics.
-                ONLY NEGATIVE POST"""
+                ONLY NEGATIVE POST.
+                IF its to large - reduce it to one sentence."""
 
 
     def send_message(self, message: str, prompt: str):
