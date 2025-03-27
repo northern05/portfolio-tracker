@@ -119,11 +119,13 @@ async def generate_full_report(
         data: PortfolioResponseExtended,
 ):
     message = f"""There is three blocks with 
-    General News & Major Events: {data.related_news}, 
-    Price Movements & Market Trends: {data.price_movements}, 
-    Investment & Ecosystem Updates: {data.investment_landscape}. 
-    Twitter news: {data.twitter_news}
-    Please generate a unified report that combines the following three news sections into a cohesive narrative."""
+                General News & Major Events: {data.related_news}, 
+                Price Movements & Market Trends: {data.price_movements}, 
+                Investment & Ecosystem Updates: {data.investment_landscape}. 
+                Please generate a unified report that combines the following three news sections into a cohesive narrative.
+                Make report as concise and informative as possible. One short sentence for every news.
+                Include twitter news to report but dont say that this news from official twitter account: {data.twitter_news}
+                """
     data.full_report = llama.send_message(message=message, prompt=prompts.final_prompt).removesuffix("</s>")
     return data
 

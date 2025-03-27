@@ -48,11 +48,12 @@ class LlamaDriver:
         message = f"""Parse X posts which i add in posts data with ${symbol.upper()}.
                 Posts data: {post_data}
                 Don't use "Based on your provided data, here is the requested analysis:"
-                don't use the description of the analysis method
+                Don't use the description of the analysis method
                 Don't make summarizing and drop any summarizing if exists.
                 Don't add Note or another comments, only twitter posts.
+                Make post as shorter as possible, maximum 2000 symbols.
                 DO NOT GENERATE any statistics, metrics, Only post
-                delete metrics and type if exists
+                Delete metrics and type if exists
                 RETURN as a template:"""
 
         data = {"prompt": f"{self.analize_prompt} {self.bullish}", "msg": message}
