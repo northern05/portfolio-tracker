@@ -1,4 +1,3 @@
-import io
 from datetime import datetime, timedelta
 import json
 from typing import Annotated
@@ -87,11 +86,23 @@ async def get_sentiment_score(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=errors.portfolio_errors.PROJECT_NOT_FOUND
         )
+    full_token_name = coin_gecko_driver.get_data_over_coingecko_id(token_id=portfolio.coingecko_id).get("name")
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
-    bullish, fud = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score)
+    bullish_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
+                                         prompt=prompts.bullish_fud_prompts.get("bullish") % (full_token_name, symbol))
+    bullish = await create_twitt_url(data=json.loads(bullish_data))
+    fud_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
+                                     prompt=prompts.bullish_fud_prompts.get("fud") % (full_token_name, symbol))
+    fud = await create_twitt_url(data=json.loads(fud_data))
     response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
+
+
+async def create_twitt_url(data: dict):
+    twitter_id, twitter_user_id = data.get("twitter_id"), data.get("twitter_user_id")
+    username = await twitter_scraper.get_username_by_user_id(user_id=twitter_user_id)
+    return f"https://x.com/{username}/status/{twitter_id}"
 
 
 async def create_report(
@@ -102,13 +113,20 @@ async def create_report(
 ):
     for block in prompts.prompts:
         for k, v in block.items():
-            perplexity_result = perplexity_driver.chat_without_streaming(
-                message=v.get("msg") % (
-                    symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
-                prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
+            perplexity_check = perplexity_driver.chat_without_streaming(
+                message=f"Answer only one word if any news about{full_token_name}",
+                prompt=v.get("check") % symbol
             )
-            llama_processing = llama.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))
-            setattr(data, k, llama_processing)
+            if perplexity_check.lower() == "no":
+                setattr(data, k, "No updates")
+            else:
+                perplexity_result = perplexity_driver.chat_without_streaming(
+                    message=v.get("msg") % (
+                        symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
+                    prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
+                )
+                llama_processing = llama.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))
+                setattr(data, k, llama_processing)
     twitts_over_asset = await twitter_scraper.fetch_tweets(protocol_name=twitter.split("/")[-1])
     msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {twitts_over_asset}"
     data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt).removesuffix("</s>")

@@ -2,13 +2,14 @@ prompts = [{"related_news": {
     "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between %s and %s."
                          "Ensure the target the event occurrence dates (not the publication dates). "
                          "Include language-agnostic keywords since all languages should be accepted (non-English articles will later be translated to English) [Source links at the end]",
-    "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *News* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].",
+    "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *News* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end]. Maximum 1000 symbols.",
     "msg": """General News & Major Events:
         Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
         Ensure the focus is on event occurrence dates, that occurred between %s and %s.
         Please return only high-quality sources. If any content is behind paywalls, summarize key points.
         [Source links at the end].""",
-    "title": "News"
+    "title": "News",
+    "check": "Is there any recent news about %s? Please answer with 'yes' or 'no' only."
 },
     "price_movements": {
         "perplexity_prompt": """
@@ -22,8 +23,9 @@ prompts = [{"related_news": {
             Exclude any predictions or speculative forecasts.
             Please return only high-quality sources. If any content is behind paywalls, summarize key points.
             [Source links at the end].""",
-        "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *Price Moves* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].",
-        "title": "Price Moves"
+        "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *Price Moves* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end]. Maximum 1000 symbols.",
+        "title": "Price Moves",
+        "check": "Is there any recent price movements about %s? Please answer with 'yes' or 'no' only."
     },
     "investment_landscape": {
         "perplexity_prompt": """
@@ -35,8 +37,9 @@ prompts = [{"related_news": {
             Retrieve news related to market adoption, investor sentiment, and ecosystem developments (e.g., institutional interest, major token listings, DeFi integrations) for %s, %s, %s that occurred between %s and %s.
             Please return only high-quality sources. If any content is behind paywalls, summarize key points.
             [Source links at the end].""",
-        "chatgpt_prompt": """all this news should be drawn up in the form of a template report and duplicates should be removed. news other than the Investment Landscape should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *Investment Landscape* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end].""",
-        "title": "Investment Landscape"
+        "chatgpt_prompt": """all this news should be drawn up in the form of a template report and duplicates should be removed. news other than the Investment Landscape should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *Investment Landscape* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end]. Maximum 1000 symbols.""",
+        "title": "Investment Landscape",
+        "check": "Is there any recent investment landscape about %s? Please answer with 'yes' or 'no' only."
     }
 }]
 
@@ -54,7 +57,8 @@ Ensure that each section includes the corresponding URL to its original source.
 Format the report with clear headings for each section, and present the information in a concise and informative manner.
 Information should not be repeated, if it is repeated, then decide which block it is closer to and leave it only in it. 
 Duplicate news was removed, leaving only one.
-Squeeze all message maximum to 3500 symbols in message.
+Squeeze all message maximum to 2000 symbols in message.
+If No updates - white "No updates"
 ###Output Format###
 Price Moves
 <content> / up to 1 short sentence
@@ -72,3 +76,13 @@ Identify mentions of cryptocurrency price updates, engagement levels (likes/retw
 Highlight any significant events or announcements. Also, summarize how the cryptocurrency community is reacting based on engagement metrics.
 Answer in one short sentence.
 """
+
+bullish_fud_prompts = {
+    "bullish": """"Return 1 TOP Bullish post data about %s / %s from this JSON (use engagement metrics to pick up the post from the most Bullish ones):
+                    ###Output format
+                    <{"twitter_user_id": <twitter_user_id>, "twitter_id": <twitter_id>}>
+                    ###########################################""",
+    "fud": """Return 1 TOP Bearish/FUD post data about %s / %s from this JSON (use engagement metrics to pick up the post from the most Bearish/FUD ones):
+                ###Output format
+                <{"twitter_user_id": <twitter_user_id>, "twitter_id": <twitter_id>}>
+                ###########################################"""}

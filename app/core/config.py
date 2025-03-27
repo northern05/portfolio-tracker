@@ -50,9 +50,6 @@ class TwitterCredentialsSettings(BaseSettings):
     TWITTER_PASSWORD: str = os.environ.get("TWITTER_PASSWORD")
 
 
-class OpenAISettings(BaseSettings):
-    OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY")
-
 
 class LLamaSettings(BaseSettings):
     LLAMA_URL: str = os.environ.get("LLAMA_URL", "http://195.189.60.154:8000/generate")
@@ -64,6 +61,5 @@ cmc_config = CoinMarketCapSettings()
 elfa_config = ElfaSettings()
 perplexity_config = PerplexitySettings()
 redis_config = RedisSettings()
-openai_config = OpenAISettings()
 llama_config = LLamaSettings()
 twitter_account_config = TwitterCredentialsSettings()

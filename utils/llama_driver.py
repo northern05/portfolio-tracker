@@ -1,5 +1,6 @@
 import requests
-import openai
+
+twitter_post_types = ("bullish", "fud")
 
 
 class LlamaDriver:
@@ -8,26 +9,6 @@ class LlamaDriver:
         Initializes the ChatGPT API driver.
         """
         self.BASE_URL = base_url
-        self.analize_prompt = """
-            I have collected the top {X} posts from ELFA related to cryptocurrency discussions. 
-            Each post includes text content, engagement metrics (likes, comments, shares), and timestamps. 
-            Please analyze  and return these posts based on the following criteria:
-            """
-        self.bullish = """1. #### *Top Bullish Post:*
-                - Identify the most engaging bullish post (highest likes/comments/shares) that reflects strong positive sentiment.
-                Don't make summarizing and drop any summarizing if exists.
-                Highlight text headings according to telegram's Markdown with *.
-                DO NOT GENERATE any statistics.
-                ONLY POSITIVE POST.
-                IF its to large - reduce it to one sentence."""
-        self.fud = """2. #### *Top FUD/Negative Post:*
-                - Identify the most engaging FUD/negative post that reflects concerns, fear, or uncertainty.
-                Don't make summarizing and drop any summarizing if exists.
-                Highlight text headings according to telegram's Markdown with *.
-                DO NOT GENERATE any statistics.
-                ONLY NEGATIVE POST.
-                IF its to large - reduce it to one sentence."""
-
 
     def send_message(self, message: str, prompt: str):
         """
@@ -44,28 +25,19 @@ class LlamaDriver:
         else:
             return None
 
-    def get_bullish_fud(self, symbol: str, post_data: dict):
-        message = f"""Parse X posts which i add in posts data with ${symbol.upper()}.
+    def get_bullish_fud(self, symbol: str, post_data: dict, prompt: str):
+        message = f"""Parse X posts with ${symbol.upper()}.
                 Posts data: {post_data}
-                Don't use "Based on your provided data, here is the requested analysis:"
-                Don't use the description of the analysis method
-                Don't make summarizing and drop any summarizing if exists.
-                Don't add Note or another comments, only twitter posts.
-                Make post as shorter as possible, maximum 2000 symbols.
-                DO NOT GENERATE any statistics, metrics, Only post
-                Delete metrics and type if exists
-                RETURN as a template:"""
+                Return 1 TOP post data about {symbol.upper()} 'twitter_id' and 'twitter_user_id' of this post in JSON format.""" + \
+                """(use engagement metrics to pick up the post from the most Bearish/FUD ones):
+                ###Output format
+                <{"twitter_user_id": <twitter_user_id>, "twitter_id": <twitter_id>}>
+                ###########################################"""
 
-        data = {"prompt": f"{self.analize_prompt} {self.bullish}", "msg": message}
+        data = {"prompt": prompt, "msg": message}
         response = requests.post(url=self.BASE_URL, json=data)
         if response.status_code == 200:
-            bullish = response.json().get("response").removesuffix("</s>").replace('\n',' \n ')
+            twitt = response.json().get("response").removesuffix("</s>").replace('\n', ' \n ')
         else:
-            bullish = "error result"
-        data = {"prompt": f"{self.analize_prompt} {self.fud}", "msg": message}
-        response = requests.post(url=self.BASE_URL, json=data)
-        if response.status_code == 200:
-            fud = response.json().get("response").removesuffix("</s>").replace('\n',' \n ')
-        else:
-            fud = "error result"
-        return bullish, fud
+            twitt = "error result"
+        return twitt

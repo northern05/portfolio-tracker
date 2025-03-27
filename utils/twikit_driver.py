@@ -37,9 +37,17 @@ class TwitterScraper:
         user = await self.client.get_user_by_screen_name(screen_name=username)
         return user.id
 
+    async def get_username_by_user_id(self, user_id: str):
+        if not self.login_state:
+            await self.login()
+            self.login_state = True
+        user = await self.client.get_user_by_id(user_id=user_id)
+        return user.screen_name
+
     async def fetch_tweets(self, protocol_name: str):
         if not self.login_state:
             await self.login()
+            self.login_state = True
         tweet_data = []
         tweets = None
         while True:
@@ -55,7 +63,7 @@ class TwitterScraper:
                 print(f"{protocol_name} not exists.")
 
             except Unauthorized as e:
-                await self.setup()
+                await self.login()
                 user_id = await self.get_user_id_by_username(username=protocol_name)
                 tweets = await self.get_tweets(tweets=tweets, user_id=user_id)
 
