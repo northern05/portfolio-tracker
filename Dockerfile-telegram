@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir --upgrade pip && \
 ENV TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
 
 # Run the bot
-CMD ["python3", "bot/bot.py"]
+CMD ["python3", "app/bot/bot.py"]
