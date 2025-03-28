@@ -12,7 +12,7 @@ from .schemas import PortfolioResponse, PortfolioCreate, SimilarAssetsResponse, 
     ConnectTelegram, SentimentScore
 from app.core.modules_factory import cmc_driver, perplexity_driver, elfa_driver, coin_gecko_driver, redis_db, \
     llama, twitter_scraper
-from utils.general import create_crypto_sentiment_chart
+from utils.general import create_crypto_sentiment_chart, parse_json_string
 from utils import prompts
 
 
@@ -91,18 +91,26 @@ async def get_sentiment_score(
     bullish_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
                                          prompt=prompts.bullish_fud_prompts.get("bullish") % (full_token_name, symbol),
                                          twitt_type="Bullish")
-    bullish = await create_twitt_url(data=json.loads(bullish_data.removesuffix("</s>")))
-    fud_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
-                                     prompt=prompts.bullish_fud_prompts.get("fud") % (full_token_name, symbol),
-                                     twitt_type="Bearish/FUD")
-    fud = await create_twitt_url(data=json.loads(fud_data.removesuffix("</s>")))
+    bullish = await create_twitt_url(data=parse_json_string(bullish_data))
+    fud, fud_data = await get_fud(symbol=symbol, sentiment_score=sentiment_score, full_token_name=full_token_name)
+    while fud == bullish:
+        msg = f"Twitter post with {fud_data} parameters is Bullish, choose another one."
+        fud = await get_fud(symbol=symbol, sentiment_score=sentiment_score, full_token_name=full_token_name, msg=msg)
     response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
 
 
+async def get_fud(symbol: str, sentiment_score: list, full_token_name: str, msg: str = None):
+    fud_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
+                                     prompt=prompts.bullish_fud_prompts.get("fud") % (full_token_name, symbol),
+                                     twitt_type="Bearish/FUD",
+                                     msg=msg)
+    fud = await create_twitt_url(data=parse_json_string(fud_data))
+    return fud, fud_data
+
+
 async def create_twitt_url(data: dict):
-    if isinstance(data, list): data = data[0]
     twitter_id, twitter_user_id = data.get("twitter_id"), data.get("twitter_user_id")
     username = await twitter_scraper.get_username_by_user_id(user_id=twitter_user_id)
     return f"https://x.com/{username}/status/{twitter_id}"
