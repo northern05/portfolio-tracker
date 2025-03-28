@@ -91,17 +91,18 @@ async def get_sentiment_score(
     bullish_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
                                          prompt=prompts.bullish_fud_prompts.get("bullish") % (full_token_name, symbol),
                                          twitt_type="Bullish")
-    bullish = await create_twitt_url(data=json.loads(bullish_data))
+    bullish = await create_twitt_url(data=json.loads(bullish_data.removesuffix("</s>")))
     fud_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
                                      prompt=prompts.bullish_fud_prompts.get("fud") % (full_token_name, symbol),
                                      twitt_type="Bearish/FUD")
-    fud = await create_twitt_url(data=json.loads(fud_data))
+    fud = await create_twitt_url(data=json.loads(fud_data.removesuffix("</s>")))
     response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
 
 
 async def create_twitt_url(data: dict):
+    if isinstance(data, list): data = data[0]
     twitter_id, twitter_user_id = data.get("twitter_id"), data.get("twitter_user_id")
     username = await twitter_scraper.get_username_by_user_id(user_id=twitter_user_id)
     return f"https://x.com/{username}/status/{twitter_id}"
