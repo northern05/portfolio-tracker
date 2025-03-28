@@ -1,4 +1,3 @@
-import logging
 import os
 from typing import Union
 
@@ -8,20 +7,7 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, F
 from aiogram import Router, F, types, Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.exceptions import TelegramBadRequest
-import re
-
-WALLET_REGEX = {
-    "Ethereum / BSC / Polygon (EVM-based)": r"^0x[a-fA-F0-9]{40}$",
-    "Bitcoin": r"^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$",
-    "Solana": r"^[1-9A-HJ-NP-Za-km-z]{32,44}$",
-    "Tron (TRC-20)": r"^T[a-zA-Z0-9]{33}$",
-    "Ripple (XRP)": r"^r[0-9a-zA-Z]{24,34}$",
-    "Dogecoin": r"^D{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32,34}$",
-    "Litecoin": r"^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$",
-    "Cardano (ADA)": r"^addr1[a-z0-9]+$",
-}
+from .utils import *
 
 TOKEN: str = os.environ.get('TG_TOKEN', "7540334723:AAFGudo28Myy4ltPmZLz3jhODPY4iVrkRG4")
 API_URL: str = os.environ.get('BASE_SITE', "https://api.agent.zpoken.dev/portfolio_tracker/api/v1/portfolio")
@@ -31,46 +17,8 @@ GIF_URL: str = "https://api.agent.zpoken.dev/portfolio_tracker/api/v1/portfolio/
 
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='Markdown'))
 dp = Dispatcher()
-
-self_id = 7540334723
-
-
-def get_similar_tokens(symbol: str, token_id: str = None):
-    params = {"asset_symbol": symbol}
-    if token_id:
-        params.update({"token_id": token_id})
-    result = requests.get(f"{API_URL}/similar_assets", params=params)
-    return result.json()
-
-
-def validate_wallet(address: str):
-    for blockchain, pattern in WALLET_REGEX.items():
-        if re.match(pattern, address):
-            return True, f"✅ Valid {blockchain} wallet!"
-    return False, "❌ Invalid wallet address."
-
-
-def format_market_cap(market_cap):
-    """Formats the market cap to a human-readable format (B, M, K)."""
-    if market_cap >= 1_000_000_000:  # Billion
-        return f"MCap {market_cap / 1_000_000_000:.1f}B"
-    elif market_cap >= 1_000_000:  # Million
-        return f"MCap {market_cap / 1_000_000:.1f}M"
-    elif market_cap >= 1_000:  # Thousand
-        return f"MCap {market_cap / 1_000:.1f}K"
-    else:
-        return f"MCap {market_cap}"
-
-
 tg_router = Router()
 dp.include_router(tg_router)
-
-
-class PortfolioState(StatesGroup):
-    entering_wallet = State()
-    choosing_coin = State()
-    enter_coin = State()
-    choosing_frequency = State()
 
 
 @tg_router.startup()
@@ -123,31 +71,9 @@ async def handle_command_callback(callback: types.CallbackQuery):
 @tg_router.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext) -> None:
     await state.clear()
-    # await state.set_state(PortfolioState.entering_wallet)
-    # await message.answer("Hi! I will tell you all news about cryptocurrency you want!")
-    # await message.answer("Enter your crypto-wallet to create your own portfolio:")
     await state.set_state(PortfolioState.choosing_coin)
     await message.answer("Hi! I will tell you all news about cryptocurrency you want!")
     await message.answer("Enter your currency you want to get report:")
-
-
-# @tg_router.message(PortfolioState.entering_wallet)
-# async def save_wallet(message: types.Message, state: FSMContext):
-#     wallet = message.text.strip()
-#     result, msg = validate_wallet(address=wallet)
-#     if result:
-#         response = requests.post(f"{API_URL}/connect_telegram",
-#                                  json={"telegram_id": str(message.from_user.id), "wallet": wallet})
-#         if response.status_code == 200:
-#             await state.set_state(PortfolioState.choosing_coin)
-#             await message.answer(
-#                 "Wallet saved! Enter cryptocurrency you want to see news (for example: BTC, ETH, SOL):")
-#         else:
-#             await message.answer("Error wallet adding. Try another one time.")
-#     else:
-#         await message.answer(msg)
-#         await message.answer("Enter your crypto-wallet to create your own portfolio:")
-#         await state.set_state(PortfolioState.entering_wallet)
 
 
 @tg_router.message(PortfolioState.choosing_coin)
@@ -297,7 +223,7 @@ async def remove_coin(callback: types.CallbackQuery):
     response = requests.delete(f"{API_URL}", params={"telegram_id": str(callback.from_user.id), "symbol": coin})
 
     if response.status_code == 202:
-        await callback.answer(f"✅ Coin **{coin}** removed!", parse_mode='Markdown')
+        await callback.answer(f"✅ Coin *{coin}* removed!", parse_mode='Markdown')
     else:
         await callback.answer("❌ Error removing coin. Please try again.")
     await edit_portfolio_menu(callback.message)
@@ -324,7 +250,7 @@ async def get_report(callback: types.CallbackQuery):
 
         # ✅ Send the chart image
         await bot.send_photo(chat_id=callback.from_user.id, photo=FSInputFile(image_path),
-                             caption="📊 **Price movements**", parse_mode='Markdown')
+                             caption="📊 *Price movements*", parse_mode='Markdown')
 
         # Remove image after sending
         os.remove(image_path)
@@ -337,15 +263,15 @@ async def get_report(callback: types.CallbackQuery):
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
-        news = data.get("full_report", "No news available.")
-        price = data.get("current_price", {}).get("price_usd", "N/A")
+        news = f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
+        price = data.get("current_price", "Undefined").get("price_usd", "N/A")
         # ✅ Send news & price separately
         await bot.delete_message(
             chat_id=processing_message.chat.id,
             message_id=processing_message.message_id
         )
 
-        await callback.message.answer(f"📰 *News by {coin}:* \n{news}", parse_mode='MarkdownV2')
+        await callback.message.answer(escape_markdown(news), parse_mode='MarkdownV2')
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:
@@ -407,44 +333,6 @@ async def get_report(callback: types.CallbackQuery):
             await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
     await callback.message.answer("Maybe I can help you more?")
     await edit_portfolio_menu(callback.message)
-
-
-# @tg_router.message(F.text)
-# async def process_choice(message: types.Message, state: FSMContext):
-#     await state.clear()
-#     data = await state.get_data()
-#     chosen_token = message.text
-#
-#     print(f"[DEBUG] User selected: {chosen_token}")
-#
-#     await state.update_data(token=chosen_token)
-#
-#     keyboard = types.ReplyKeyboardMarkup(
-#         keyboard=[
-#             [types.KeyboardButton(text="1"), types.KeyboardButton(text="7"), types.KeyboardButton(text="30")]
-#         ],
-#         resize_keyboard=True,
-#         one_time_keyboard=True
-#     )
-#
-#     await message.answer("Оберіть періодичність оновлення (в днях):", reply_markup=keyboard)
-#     await state.set_state(NewsSubscription.choosing_frequency)
-#
-#
-# @tg_router.message(NewsSubscription.choosing_frequency)
-# async def process_frequency(message: types.Message, state: FSMContext):
-#     frequency = message.text
-#     if not frequency.isdigit():
-#         await message.answer("Будь ласка, введіть число (кількість днів).")
-#         return
-#
-#     data = await state.get_data()
-#     chosen_token = data.get("token")
-#
-#     print(f"[DEBUG] User subscribed to {chosen_token} with frequency {frequency} days")
-#
-#     await message.answer(f"Ви підписалися на новини про {chosen_token} раз на {frequency} днів.")
-#     await state.clear()
 
 
 if __name__ == "__main__":
