@@ -25,12 +25,12 @@ class LlamaDriver:
         else:
             return None
 
-    def get_bullish_fud(self, symbol: str, post_data: dict, prompt: str):
+    def get_bullish_fud(self, symbol: str, post_data: dict, prompt: str, twitt_type: str):
         message = f"""Parse X posts with ${symbol.upper()}.
                 Posts data: {post_data}
-                Return 1 TOP post data about {symbol.upper()} 'twitter_id' and 'twitter_user_id' of this post in JSON format.""" + \
-                """(use engagement metrics to pick up the post from the most Bearish/FUD ones):
-                ###Output format
+                Return 1 TOP {twitt_type.upper()} post data about {symbol.upper()} 'twitter_id' and 'twitter_user_id' of this post in JSON format.
+                (use engagement metrics to pick up the post from the {twitt_type.upper()} ones):""" + \
+                """###Output format
                 <{"twitter_user_id": <twitter_user_id>, "twitter_id": <twitter_id>}>
                 ###########################################"""
 
