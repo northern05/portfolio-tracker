@@ -3,7 +3,7 @@ WORKDIR /app
 
 # Copy only the necessary files
 COPY bot_requirements.txt ./
-COPY app/bot/ ./bot/
+COPY bot/ ./bot/
 
 # Install dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
