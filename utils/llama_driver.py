@@ -30,7 +30,7 @@ class LlamaDriver:
                 Posts data: {post_data}
                 Return TOP 1 {twitt_type.upper()} post data about {symbol.upper()} 'twitter_id' and 'twitter_user_id' of this post in JSON format.
                 (use engagement metrics to pick up the post from the {twitt_type.upper()} ones):""" + \
-                """###Output format
+                """###Output format in JSON format:
                 {"twitter_user_id": <twitter_user_id>, "twitter_id": <twitter_id>}
                 ###########################################"""
 

@@ -1,13 +1,11 @@
-import os
 from typing import Union
 
-import requests
 from aiogram.client.default import DefaultBotProperties
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from aiogram import Router, F, types, Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
-from .utils import *
+from app.bot.bot_utils import *
 
 TOKEN: str = os.environ.get('TG_TOKEN', "7540334723:AAFGudo28Myy4ltPmZLz3jhODPY4iVrkRG4")
 API_URL: str = os.environ.get('BASE_SITE', "https://api.agent.zpoken.dev/portfolio_tracker/api/v1/portfolio")
@@ -263,7 +261,7 @@ async def get_report(callback: types.CallbackQuery):
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
-        news = f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
+        news = escape_markdown(data.get('full_report', 'No news available.')) #f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
         price = data.get("current_price", "Undefined").get("price_usd", "N/A")
         # ✅ Send news & price separately
         await bot.delete_message(
@@ -271,14 +269,14 @@ async def get_report(callback: types.CallbackQuery):
             message_id=processing_message.message_id
         )
 
-        await callback.message.answer(escape_markdown(news), parse_mode='MarkdownV2')
+        await callback.message.answer(f"📰 *News by {coin}:* \n{news}", parse_mode='MarkdownV2')
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
         bullish = data.get('bullish')
         fud = data.get('fud')
-        await callback.message.answer(f"📊 X/Twitter:", parse_mode='Markdown')
+        await callback.message.answer(f"📊 *X/Twitter:*", parse_mode='Markdown')
         await callback.message.answer(f"\n [TOP 1 Bullish]({bullish})", parse_mode='MarkdownV2')
         await callback.message.answer(f"\n [TOP 1 Bearish/FUD]({fud})", parse_mode='MarkdownV2')
     else:
