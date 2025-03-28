@@ -152,7 +152,7 @@ async def generate_full_report(
                 <1. updates> / up to 1 short sentences per each news MAXIMUM 200 symbols.
                 <2. updates> / up to 1 short sentences per each news MAXIMUM 200 symbols.
                 <3. updates> / up to 1 short sentences per each news MAXIMUM 200 symbols.
-                ADD all active links in the end of the message
+                ADD all active links in the end of the message in format: [<short description>](link)
                 """
     data.full_report = llama.send_message(message=message, prompt=prompts.final_prompt).removesuffix("</s>")
     return data
