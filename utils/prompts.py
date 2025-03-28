@@ -35,7 +35,7 @@ prompts = [{"related_news": {
                           "#### *Price Moves* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
                           "[Active source links at the end]. Maximum 200 symbols.",
         "title": "Price Moves",
-        "check": "Is there any recent price movements about %s? Please answer with 'yes' or 'no' only."
+        "check": "Find some news about price movements about $%s?"
     },
     # "investment_landscape": {
     #     "perplexity_prompt": """
