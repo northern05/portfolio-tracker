@@ -26,7 +26,7 @@ class ElfaDriver:
 
         return filtered_tweets
 
-    def get_top_posts(self, symbol: str, time_window: str = "7d", page: int = 1,
+    def get_top_posts(self, symbol: str, time_window: str = "2d", page: int = 1,
                       page_size: int = 50):
         url = f'{self.ELFA_URL}/top-mentions?ticker={symbol}&timeWindow={time_window}&page={page}&pageSize={page_size}'
         headers = {

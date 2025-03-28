@@ -125,7 +125,8 @@ async def create_report(
                         symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
                     prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
                 )
-                llama_processing = llama.send_message(message=perplexity_result, prompt=v.get("chatgpt_prompt"))
+                llama_processing = llama.send_message(message=perplexity_result.removesuffix("</s>"),
+                                                      prompt=v.get("chatgpt_prompt"))
                 setattr(data, k, llama_processing)
     twitts_over_asset = await twitter_scraper.fetch_tweets(protocol_name=twitter.split("/")[-1])
     msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {twitts_over_asset}"
@@ -136,13 +137,22 @@ async def create_report(
 async def generate_full_report(
         data: PortfolioResponseExtended,
 ):
-    message = f"""There is three blocks with 
-                General News & Major Events: {data.related_news}, 
-                Price Movements & Market Trends: {data.price_movements}, 
-                Investment & Ecosystem Updates: {data.investment_landscape}. 
-                Please generate a unified report that combines the following three news sections into a cohesive narrative.
-                Make report as concise and informative as possible. One short sentence for every news.
-                Include twitter news to report but dont say that this news from official twitter account: {data.twitter_news}
+    message = f"""Generate short report MAXIMUM 1000 symbols with two blocks 
+                #### *Updates* {data.related_news}, include twitter news to report but don't say that this 
+                news from official twitter account: {data.twitter_news}.
+                #### *Price Movements & Market Trends*: {data.price_movements}.
+                Remove duplicate news, leaving only one.
+                If No updates - write "No updates"
+                ###Output Format###
+                #### *Price Moves*
+                <content> / up to 1 short sentence MAXIMUM 200 symbols.
+                #### *Updates* (do not include any data about price moves here, only Investment & Ecosystem Updates and General News & Major Events)
+                <1. updates> / up to 1 short sentences per each news MAXIMUM 200 symbols.
+                <2. updates> / up to 1 short sentences per each news MAXIMUM 200 symbols.
+                <3. updates> / up to 1 short sentences per each news MAXIMUM 200 symbols.
+                Save all sources and links in the end of the message
+                [Active source links at the end].
+                ADD all active links in the end
                 """
     data.full_report = llama.send_message(message=message, prompt=prompts.final_prompt).removesuffix("</s>")
     return data
