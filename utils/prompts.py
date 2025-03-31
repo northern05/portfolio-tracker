@@ -60,18 +60,16 @@ keywords = f"""
             - **Futures Launch**
             """
 
-final_prompt = """Use this template to generate the report based on the provided data: 
+final_prompt = """Generate a final report that combines the two sections into a cohesive narrative. 
+Squeeze all message maximum to 1000 symbols in message.
 If No updates - write "No updates"
 ###Output Format###
 #### Price Moves
 <content> / up to 1 short sentence maximum 200 symbols.
 #### Updates (do not include any data about price moves here, only Investment & Ecosystem Updates and General News & Major Events)
-Updates (do not include any data about price moves here)
-<1. updates> / up to 1 sentences (not more than 30 words) per each news
-<2. updates> / up to 1 sentences (not more than 30 words) per each news
-<3. updates> / up to 1 sentences (not more than 30 words) per each news
-<4. updates> / up to 1 sentences (not more than 30 words) per each news
-<5. updates> / up to 1 sentences (not more than 30 words) per each news
+<1. updates> / up to 1 short sentences per each news maximum 200 symbols.
+<2. updates> / up to 1 short sentences per each news maximum 200 symbols.
+<3. updates> / up to 1 short sentences per each news maximum 200 symbols.
 Save all sources and links in the end of the message
 MAXIMUM 1000 symbols without links.
 [Active source links at the end].
