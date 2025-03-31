@@ -1,7 +1,6 @@
 import os
 import re
 import requests
-from linkify_it import LinkifyIt
 from urllib.parse import urlparse
 
 from aiogram.fsm.state import State, StatesGroup
@@ -63,17 +62,20 @@ def escape_markdown(text):
 
 
 def format_urls_in_report(report):
-    linkify = LinkifyIt()
-    matches = linkify.match(report)
-    if not matches:
-        return report
+    # Regular expression pattern to match URLs
+    url_pattern = re.compile(r'https?://\S+')
 
-    # Reverse the matches list to replace from the end of the string
-    for match in reversed(matches):
-        url = match.url
-        domain = urlparse(url).netloc
-        markdown_link = f'[{domain}]({url})'
-        # Replace the URL in the report; match.index and match.last_index give the span of the URL
-        report = report[:match.index] + markdown_link + report[match.last_index:]
+    # Find all URLs in the report
+    urls = url_pattern.findall(report)
+
+    # Replace each URL with a numbered Markdown link
+    for index, url in enumerate(urls, start=1):
+
+        markdown_link = f'[{extract_domain(url)}]({url})\n'
+        report = report.replace(url, markdown_link, 1)
 
     return report
+
+def extract_domain(url):
+    parsed_url = urlparse(url)
+    return parsed_url.netloc
