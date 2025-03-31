@@ -115,6 +115,7 @@ async def add_coins_to_portfolio(message: types.Message, state: FSMContext):
         await message.answer(f"Coin {symbol} added to your portfolio! 🎉")
     else:
         await message.answer("Failed. Try later.")
+    await edit_portfolio_menu(message)
 
 
 @tg_router.message(Command("my_portfolio"))
