@@ -1,5 +1,7 @@
 import io
 import json
+import ast
+import re
 from datetime import datetime, timedelta
 import uuid
 import requests
@@ -95,9 +97,9 @@ def create_crypto_sentiment_chart(historical_prices, sentiment_data: dict = None
 def parse_json_string(json_str):
     # Remove leading and trailing whitespace
     json_str = json_str.strip()
-
+    # Replace only the single quotes around keys and values
+    json_str = re.sub(r"(?<!\w)'|'(?!\w)", '"', json_str)
     try:
-        # Attempt to parse as a single JSON object
         data = json.loads(json_str)
         if isinstance(data, dict):
             return data
@@ -105,9 +107,5 @@ def parse_json_string(json_str):
             return data[0]
         else:
             raise ValueError("JSON does not contain a single dictionary.")
-    except json.JSONDecodeError:
-        # Handle cases where json_str is not valid JSON
-        raise ValueError(f"Invalid JSON format. {json_str}")
-    except Exception as e:
-        # Handle other exceptions
-        raise ValueError(f"An error occurred: {e}")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON format: {e}")

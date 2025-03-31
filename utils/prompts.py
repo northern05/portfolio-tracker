@@ -90,11 +90,6 @@ Answer in one short sentence.
 """
 
 bullish_fud_prompts = {
-    "bullish": """"Return 1 TOP Bullish post data about %s / %s from this JSON (use engagement metrics to pick up the post from the most Bullish ones):
-                    ###Output format
-                    <{"twitter_user_id": <twitter_user_id>, "twitter_id": <twitter_id>}>
-                    ###########################################""",
-    "fud": """Return 1 TOP Bearish/FUD post data about %s / %s from this JSON (use engagement metrics to pick up the post from the most Bearish/FUD ones):
-                ###Output format
-                <{"twitter_user_id": <twitter_user_id>, "twitter_id": <twitter_id>}>
-                ###########################################"""}
+    "bullish": "You are sentiment analyzing agent. Return TOP 1 bullish post based on posts data provided in JSON format for specified Token ticker. Use engagement metrics to pick the post from the most Bullish ones. Use output format for response: {'twitter_user_id': <twitter_user_id>, 'twitter_id': <twitter_id>} \n###########################################",
+    "fud": "You are sentiment analyzing agent. Return TOP 1 Bearish/FUD post based on posts data provided in JSON format for specified Token ticker. Use engagement metrics to pick the post from the most Bearish/FUD ones. Use output format for response: {'twitter_user_id': <twitter_user_id>, 'twitter_id': <twitter_id>} \n###########################################"
+}

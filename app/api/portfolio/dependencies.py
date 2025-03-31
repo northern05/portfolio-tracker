@@ -89,7 +89,7 @@ async def get_sentiment_score(
     full_token_name = coin_gecko_driver.get_data_over_coingecko_id(token_id=portfolio.coingecko_id).get("name")
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
     bullish_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
-                                         prompt=prompts.bullish_fud_prompts.get("bullish") % (full_token_name, symbol),
+                                         prompt=prompts.bullish_fud_prompts.get("bullish"),
                                          twitt_type="Bullish")
     bullish = await create_twitt_url(data=parse_json_string(bullish_data))
     fud, fud_data = await get_fud(symbol=symbol, sentiment_score=sentiment_score, full_token_name=full_token_name)
@@ -103,7 +103,7 @@ async def get_sentiment_score(
 
 async def get_fud(symbol: str, sentiment_score: list, full_token_name: str, msg: str = None):
     fud_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
-                                     prompt=prompts.bullish_fud_prompts.get("fud") % (full_token_name, symbol),
+                                     prompt=prompts.bullish_fud_prompts.get("fud"),
                                      twitt_type="Bearish/FUD",
                                      msg=msg)
     fud = await create_twitt_url(data=parse_json_string(fud_data))

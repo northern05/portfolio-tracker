@@ -26,14 +26,8 @@ class LlamaDriver:
             return None
 
     def get_bullish_fud(self, symbol: str, post_data: dict, prompt: str, twitt_type: str, msg: str = None):
-        message = f"""Parse X posts with ${symbol.upper()}.
-                Posts data: {post_data}
-                Return TOP 1 {twitt_type.upper()} post data about {symbol.upper()} 'twitter_id' and 'twitter_user_id' of this post in JSON format.
-                (use engagement metrics to pick up the post from the {twitt_type.upper()} ones):""" + \
-                """###Output format in JSON format:
-                {"twitter_user_id": <twitter_user_id>, "twitter_id": <twitter_id>}
-                ###########################################"""
-        message = message + msg if msg else ""
+        message = f"Token Ticker: ${symbol.upper()} \n Type of witter post to be returned: ${twitt_type.upper()} \nPosts: {post_data}"
+        # message = message + msg if msg else ""
 
         data = {"prompt": prompt, "msg": message}
         response = requests.post(url=self.BASE_URL, json=data)
