@@ -1,40 +1,41 @@
-prompts = [{"related_news": {
-    "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between %s and %s."
-                         "Ensure the target the event occurrence dates (not the publication dates). "
-                         "Include language-agnostic keywords since all languages should be accepted (non-English articles will later be translated to English) [Source links at the end]",
-    "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: "
-                      "For each categorized article, generate a concise summary that includes: "
-                      "- The headline - A brief description of the event (including the event date) "
-                      "- Direct source link(s) Format the final report with the following structure: "
-                      "#### Updates [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
-                      "[Active source links at the end]. Maximum 500 symbols.",
-    "msg": """General News & Major Events:
-        Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
-        Ensure the focus is on event occurrence dates, that occurred between %s and %s.
-        Please return only high-quality sources. If any content is behind paywalls, summarize key points.
-        [Active source links at the end].""",
-    "title": "News",
-    "check": "Is there any recent news about %s? Please answer with 'yes' or 'no' only."
-},
-    "price_movements": {
-        "perplexity_prompt": """
+prompts = [{"price_movements": {
+    "perplexity_prompt": """
             Retrieve news articles detailing actual price movements of %s strictly within %s and %s date range. Exclud any predictions or forecasts
             - show me all links when you get information
             - [Active source source links at the end]""",
-        "msg": """Price Movements & Market Trends:
+    "msg": """Price Movements & Market Trends:
             Identify articles discussing past price movements and volatility for %s, %s, %s that occurred between %s and %s.
             Exclude any predictions or speculative forecasts.
             Please return only high-quality sources. If any content is behind paywalls, summarize key points.
             [Active source links at the end].""",
-        "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates "
-                          "should be removed template format: For each categorized article, generate a concise summary that includes: "
+    "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates "
+                      "should be removed template format: For each categorized article, generate a concise summary that includes: "
+                      "- The headline - A brief description of the event (including the event date) "
+                      "- Direct source link(s) Format the final report with the following structure: "
+                      "#### Price Moves [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
+                      "[Active source links at the end]. Maximum 200 symbols.",
+    "title": "Price Moves",
+    "check": "Find some news about price movements about $%s?"
+},
+    "related_news": {
+        "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between %s and %s."
+                             "Ensure the target the event occurrence dates (not the publication dates). "
+                             "Include language-agnostic keywords since all languages should be accepted (non-English articles will later be translated to English) [Source links at the end]",
+        "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: "
+                          "For each categorized article, generate a concise summary that includes: "
                           "- The headline - A brief description of the event (including the event date) "
                           "- Direct source link(s) Format the final report with the following structure: "
-                          "#### Price Moves [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
-                          "[Active source links at the end]. Maximum 200 symbols.",
-        "title": "Price Moves",
-        "check": "Find some news about price movements about $%s?"
+                          "#### Updates [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
+                          "[Active source links at the end]. Maximum 500 symbols.",
+        "msg": """Updates:
+        Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
+        Ensure the focus is on event occurrence dates, that occurred between %s and %s.
+        Please return only high-quality sources. If any content is behind paywalls, summarize key points.
+        [Active source links at the end].""",
+        "title": "Updates",
+        "check": "Is there any recent news about %s? Please answer with 'yes' or 'no' only."
     },
+
     # "investment_landscape": {
     #     "perplexity_prompt": """
     #         Find news articles about investment landscape and ecosystem updates for %s:
