@@ -71,7 +71,8 @@ async def cmd_start(message: Message, state: FSMContext) -> None:
     await state.clear()
     await state.set_state(PortfolioState.choosing_coin)
     await message.answer("Hi! I will tell you all news about cryptocurrency you want!")
-    await message.answer("Enter your currency you want to get report:")
+    await edit_portfolio_menu(message)
+    # await message.answer("Enter your currency you want to get report:")
 
 
 @tg_router.message(PortfolioState.choosing_coin)
