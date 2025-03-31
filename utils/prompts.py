@@ -6,7 +6,7 @@ prompts = [{"related_news": {
                       "For each categorized article, generate a concise summary that includes: "
                       "- The headline - A brief description of the event (including the event date) "
                       "- Direct source link(s) Format the final report with the following structure: "
-                      "#### *News* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
+                      "#### Updates [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
                       "[Active source links at the end]. Maximum 500 symbols.",
     "msg": """General News & Major Events:
         Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
@@ -18,9 +18,7 @@ prompts = [{"related_news": {
 },
     "price_movements": {
         "perplexity_prompt": """
-            Find news articles about past price movements for %s:
-            - within %s and %s date range
-            - excluding any predictions or forecasts
+            Retrieve news articles detailing actual price movements of %s strictly within %s and %s date range. Exclud any predictions or forecasts
             - show me all links when you get information
             - [Active source source links at the end]""",
         "msg": """Price Movements & Market Trends:
@@ -32,7 +30,7 @@ prompts = [{"related_news": {
                           "should be removed template format: For each categorized article, generate a concise summary that includes: "
                           "- The headline - A brief description of the event (including the event date) "
                           "- Direct source link(s) Format the final report with the following structure: "
-                          "#### *Price Moves* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
+                          "#### Price Moves [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
                           "[Active source links at the end]. Maximum 200 symbols.",
         "title": "Price Moves",
         "check": "Find some news about price movements about $%s?"
@@ -62,20 +60,18 @@ keywords = f"""
             - **Futures Launch**
             """
 
-final_prompt = """Generate a final report that combines the two sections into a cohesive narrative. 
-Ensure that each section includes the corresponding URL to its original source. 
-Format the report with clear headings for each section, and present the information in a concise and informative manner.
-Information should not be repeated, if it is repeated, then decide which block it is closer to and leave it only in it. 
-Remove duplicate news, leaving only one.
-Squeeze all message maximum to 1000 symbols in message.
+final_prompt = """Use this template to generate the report based on the provided data: 
 If No updates - write "No updates"
 ###Output Format###
-#### *Price Moves*
+#### Price Moves
 <content> / up to 1 short sentence maximum 200 symbols.
-#### *Updates* (do not include any data about price moves here, only Investment & Ecosystem Updates and General News & Major Events)
-<1. updates> / up to 1 short sentences per each news maximum 200 symbols.
-<2. updates> / up to 1 short sentences per each news maximum 200 symbols.
-<3. updates> / up to 1 short sentences per each news maximum 200 symbols.
+#### Updates (do not include any data about price moves here, only Investment & Ecosystem Updates and General News & Major Events)
+Updates (do not include any data about price moves here)
+<1. updates> / up to 1 sentences (not more than 30 words) per each news
+<2. updates> / up to 1 sentences (not more than 30 words) per each news
+<3. updates> / up to 1 sentences (not more than 30 words) per each news
+<4. updates> / up to 1 sentences (not more than 30 words) per each news
+<5. updates> / up to 1 sentences (not more than 30 words) per each news
 Save all sources and links in the end of the message
 MAXIMUM 1000 symbols without links.
 [Active source links at the end].

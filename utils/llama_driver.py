@@ -25,9 +25,8 @@ class LlamaDriver:
         else:
             return None
 
-    def get_bullish_fud(self, symbol: str, post_data: dict, prompt: str, twitt_type: str, msg: str = None):
+    def get_bullish_fud(self, symbol: str, post_data: dict, prompt: str, twitt_type: str):
         message = f"Token Ticker: ${symbol.upper()} \n Type of witter post to be returned: ${twitt_type.upper()} \nPosts: {post_data}"
-        # message = message + msg if msg else ""
 
         data = {"prompt": prompt, "msg": message}
         response = requests.post(url=self.BASE_URL, json=data)
