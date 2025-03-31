@@ -271,7 +271,7 @@ async def get_report(callback: types.CallbackQuery):
             message_id=processing_message.message_id
         )
 
-        await callback.message.answer(f"📰 *News by {coin}:* \n{format_urls_in_report(news)}", parse_mode='MarkdownV2')
+        await callback.message.answer(f"📰 *News by {coin}:* \n{format_urls_in_report(news)}", parse_mode='MarkdownV2', disable_web_page_preview=True)
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:

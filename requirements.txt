@@ -80,3 +80,4 @@ kaleido
 aiogram
 scipy
 twikit
+linkify-it-py
