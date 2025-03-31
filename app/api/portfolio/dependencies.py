@@ -172,7 +172,7 @@ async def get_selected_portfolio_chart(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=errors.portfolio_errors.PROJECT_NOT_FOUND
         )
-    historical_price = coin_gecko_driver.get_historical_prices(symbol=portfolio.symbol)
+    historical_price = coin_gecko_driver.get_historical_prices(coingecko_id=portfolio.coingecko_id)
     # sentiment_score = elfa_driver.get_top_posts(symbol=portfolio.symbol)
     response_data = create_crypto_sentiment_chart(historical_prices=historical_price)
     await redis_db.set(f"{portfolio.symbol}_graph", response_data.getvalue(), ex=86400)

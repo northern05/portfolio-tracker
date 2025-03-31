@@ -5,7 +5,7 @@ import datetime
 class CryptoPriceFetcher:
     BASE_URL = "https://api.coingecko.com/api/v3"
 
-    def get_historical_prices(self, symbol: str, days: int = 30, currency: str = "usd"):
+    def get_historical_prices(self, coingecko_id: str, days: int = 7, currency: str = "usd"):
         """
         Fetch historical price data for a given token using CoinGecko.
 
@@ -15,11 +15,7 @@ class CryptoPriceFetcher:
         :return: List of dictionaries containing date and price.
         """
         # Get CoinGecko ID for the token symbol
-        coin_id = self.get_coin_id(symbol)
-        if not coin_id:
-            return {"error": f"Token '{symbol}' not found"}
-
-        url = f"{self.BASE_URL}/coins/{coin_id}/market_chart"
+        url = f"{self.BASE_URL}/coins/{coingecko_id}/market_chart"
         params = {"vs_currency": currency, "days": days}
 
         response = requests.get(url, params=params)
