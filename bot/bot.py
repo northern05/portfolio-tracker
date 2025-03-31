@@ -87,7 +87,7 @@ async def process_token(message: types.Message, state: FSMContext):
             [types.KeyboardButton(
                 text=f"{str(token.get('symbol'))} {format_market_cap(token.get('market_cap'))}$ {token.get('token_id')}")]
             for
-            token in similar_tokens],
+            token in similar_tokens if isinstance(token, dict)],
         resize_keyboard=True,
         one_time_keyboard=True
     )
