@@ -58,3 +58,18 @@ def escape_markdown(text):
     """
     escape_chars = r'_*[]()~`>#+-=|{}.!'
     return re.sub(r'([%s])' % re.escape(escape_chars), r'\\\1', text)
+
+
+def format_urls_in_report(report):
+    # Regular expression pattern to match URLs
+    url_pattern = re.compile(r'https?://\S+')
+
+    # Find all URLs in the report
+    urls = url_pattern.findall(report)
+
+    # Replace each URL with a numbered Markdown link
+    for index, url in enumerate(urls, start=1):
+        markdown_link = f'[{index}]({url})'
+        report = report.replace(url, markdown_link, 1)
+
+    return report
