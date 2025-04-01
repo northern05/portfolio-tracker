@@ -86,7 +86,6 @@ async def get_sentiment_score(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=errors.portfolio_errors.PROJECT_NOT_FOUND
         )
-    full_token_name = coin_gecko_driver.get_data_over_coingecko_id(token_id=portfolio.coingecko_id).get("name")
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
     bullish_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
                                          prompt=prompts.bullish_fud_prompts.get("bullish"),

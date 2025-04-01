@@ -263,7 +263,8 @@ async def get_report(callback: types.CallbackQuery):
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
-        news = escape_markdown(data.get('full_report', 'No news available.')) #f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
+        formated_urls = format_urls_in_report(data.get('full_report', 'No news available.'))
+        escaped_report = escape_markdown(formated_urls) #f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
         price = data.get("current_price", "Undefined").get("price_usd", "N/A")
         # ✅ Send news & price separately
         await bot.delete_message(
@@ -271,7 +272,7 @@ async def get_report(callback: types.CallbackQuery):
             message_id=processing_message.message_id
         )
 
-        await callback.message.answer(f"📰 *News by {coin}:* \n{format_urls_in_report(news)}", parse_mode='MarkdownV2', disable_web_page_preview=True)
+        await callback.message.answer(f"📰 *News by {coin}:* \n{escaped_report}", parse_mode='MarkdownV2', disable_web_page_preview=True)
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:

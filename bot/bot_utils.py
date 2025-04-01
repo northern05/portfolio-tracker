@@ -1,6 +1,7 @@
 import os
 import re
 import requests
+import string
 from urllib.parse import urlparse
 
 from aiogram.fsm.state import State, StatesGroup
@@ -67,11 +68,12 @@ def format_urls_in_report(report):
 
     # Find all URLs in the report
     urls = url_pattern.findall(report)
+    translator = str.maketrans('', '', string.punctuation)
 
     # Replace each URL with a numbered Markdown link
     for index, url in enumerate(urls, start=1):
 
-        markdown_link = f'[{extract_domain(url)}]({url})\n'
+        markdown_link = f'[{extract_domain(url)}]({url})\n'.replace(f"({url})", "")
         report = report.replace(url, markdown_link, 1)
 
     return report
