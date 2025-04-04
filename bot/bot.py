@@ -287,7 +287,8 @@ async def get_report(callback: types.CallbackQuery):
         fud = data.get('fud')
         await callback.message.answer(f"📊 *X/Twitter:*", parse_mode='Markdown')
         await callback.message.answer(f"\n [TOP 1 Bullish]({bullish})", parse_mode='MarkdownV2')
-        await callback.message.answer(f"\n [TOP 1 Bearish/FUD]({fud})", parse_mode='MarkdownV2')
+        if bullish != fud:
+            await callback.message.answer(f"\n [TOP 1 Bearish/FUD]({fud})", parse_mode='MarkdownV2')
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
     await callback.message.answer(f"💰 *Current price:* {round(price, 2)} USD", parse_mode='Markdown')

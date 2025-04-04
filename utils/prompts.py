@@ -67,7 +67,6 @@ final_price_movements_prompt = """Generate a final for specified Token ticker re
 <content> / up to 1 short sentence maximum 200 symbols.
 Do not add data that is not related to price movements here.
 MAXIMUM 200 symbols without links.
-[Active source links at the end].
 ADD all active links in the end
 """
 
@@ -79,7 +78,6 @@ If No updates - write "No updates"
 <2. updates> / up to 1 short sentences per each news maximum 200 symbols.
 <3. updates> / up to 1 short sentences per each news maximum 200 symbols.
 MAXIMUM 600 symbols without links.
-[Active source links at the end].
 ADD all active links in the end
 """
 
