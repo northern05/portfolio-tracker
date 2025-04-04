@@ -1,6 +1,8 @@
 import json
 import asyncio
-from twikit import Client, TooManyRequests, UserNotFound, Unauthorized
+import logging
+
+from twikit import Client, TooManyRequests, UserNotFound, Unauthorized, AccountSuspended
 from datetime import datetime, timedelta, timezone
 from random import randint
 
@@ -61,11 +63,13 @@ class TwitterScraper:
                 await asyncio.sleep(wait_time)
             except UserNotFound as e:
                 print(f"{protocol_name} not exists.")
-
             except Unauthorized as e:
                 await self.login()
                 user_id = await self.get_user_id_by_username(username=protocol_name)
                 tweets = await self.get_tweets(tweets=tweets, user_id=user_id)
+            except AccountSuspended as e:
+                logging.info(f"Too many requests to twitter: {e}")
+                return None
 
             if not tweets and not tweet_data:
                 print(f"{datetime.now()} - No more tweets found")

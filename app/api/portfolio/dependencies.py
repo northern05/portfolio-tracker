@@ -130,19 +130,28 @@ async def create_report(
                                                       prompt=v.get("chatgpt_prompt"))
                 setattr(data, k, llama_processing)
     twitts_over_asset = await twitter_scraper.fetch_tweets(protocol_name=twitter.split("/")[-1])
-    msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {twitts_over_asset}"
-    data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt).removesuffix("</s>")
+    if twitts_over_asset:
+        msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {twitts_over_asset}"
+        data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt).removesuffix("</s>")
     return data
 
 
 async def generate_full_report(
         data: PortfolioResponseExtended,
 ):
-    message = f"""Generate report according to base prompt rules. Token ticker: {data.symbol}, data on which the report should be based: {data.related_news}, {data.twitter_news}.
+    message = f"""Generate report according to base prompt rules. Token ticker: {data.symbol}, 
+                data on which the report should be based: {data.related_news}, {data.twitter_news if data.twitter_news else ""}.
                 Remove duplicate news, leaving only one."""
-    data.related_news = llama.send_message(message=message, prompt=prompts.final_updates_prompt).removesuffix("</s>")
-    message = f"""Generate report according to base prompt rules. Token ticker: {data.symbol}, data on which the report should be based: {data.price_movements}."""
-    data.price_movements = llama.send_message(message=message, prompt=prompts.final_price_movements_prompt).removesuffix("</s>")
+    data.related_news = llama.send_message(
+        message=message,
+        prompt=prompts.final_updates_prompt
+    ).removesuffix("</s>")
+    message = f"""Generate report according to base prompt rules. Token ticker: {data.symbol}, 
+                data on which the report should be based: {data.price_movements}."""
+    data.price_movements = llama.send_message(
+        message=message,
+        prompt=prompts.final_price_movements_prompt
+    ).removesuffix("</s>")
 
     return data
 
