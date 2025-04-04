@@ -263,8 +263,9 @@ async def get_report(callback: types.CallbackQuery):
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
-        formated_urls = format_urls_in_report(data.get('full_report', 'No news available.'))
-        escaped_report = escape_markdown(formated_urls) #f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
+        formated_urls = format_urls_in_report(data.get('related_news', 'No news available.'))
+        escaped_report = escape_markdown(
+            formated_urls)  # f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
         price = data.get("current_price", "Undefined").get("price_usd", "N/A")
         # ✅ Send news & price separately
         await bot.delete_message(
@@ -272,7 +273,12 @@ async def get_report(callback: types.CallbackQuery):
             message_id=processing_message.message_id
         )
 
-        await callback.message.answer(f"📰 *News by {coin}:* \n{escaped_report}", parse_mode='MarkdownV2', disable_web_page_preview=True)
+        await callback.message.answer(f"📰 *News by {coin}:* \n{escaped_report}", parse_mode='MarkdownV2',
+                                      disable_web_page_preview=True)
+        formated_urls = format_urls_in_report(data.get('price_movements', 'No news available.'))
+        escaped_report = escape_markdown(formated_urls)
+        await callback.message.answer(f"📰{escaped_report}", parse_mode='MarkdownV2',
+                                      disable_web_page_preview=True)
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:
@@ -329,7 +335,8 @@ async def get_report(callback: types.CallbackQuery):
 
             # ✅ Send news & price separately
             await callback.message.answer(f"📰 *News by {coin}:*\n{format_urls_in_report(news)}", parse_mode='Markdown')
-            await callback.message.answer(f"💰 *Current price of {coin}:* {format_urls_in_report(price)} USD", parse_mode='Markdown')
+            await callback.message.answer(f"💰 *Current price of {coin}:* {format_urls_in_report(price)} USD",
+                                          parse_mode='Markdown')
         else:
             await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
     await callback.message.answer("Maybe I can help you more?")
