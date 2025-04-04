@@ -61,18 +61,30 @@ keywords = f"""
             - **Futures Launch**
             """
 
-final_prompt = """Generate a final report that combines the two sections into a cohesive narrative. 
-Squeeze all message maximum to 1000 symbols in message.
+final_price_movements_prompt = """Generate a final report. 
+Squeeze all message maximum to 200 symbols in message.
 If No updates - write "No updates"
 ###Output Format###
 #### Price Moves
 <content> / up to 1 short sentence maximum 200 symbols.
+Do not add data that is not related to price movements here.
+Save all sources and links in the end of the message
+MAXIMUM 200 symbols without links.
+[Active source links at the end].
+ADD all active links in the end
+"""
+
+final_updates_prompt = """Generate a final report that combines the two sections into a cohesive narrative. 
+Squeeze all message maximum to 600 symbols in message.
+If No updates - write "No updates"
+Do not add data that is not related to price movements here.
+###Output Format###
 #### Updates (do not include any data about price moves here, only Investment & Ecosystem Updates and General News & Major Events)
 <1. updates> / up to 1 short sentences per each news maximum 200 symbols.
 <2. updates> / up to 1 short sentences per each news maximum 200 symbols.
 <3. updates> / up to 1 short sentences per each news maximum 200 symbols.
 Save all sources and links in the end of the message
-MAXIMUM 1000 symbols without links.
+MAXIMUM 600 symbols without links.
 [Active source links at the end].
 ADD all active links in the end
 """

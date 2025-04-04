@@ -95,11 +95,13 @@ def create_crypto_sentiment_chart(historical_prices, sentiment_data: dict = None
 
 
 def parse_json_string(json_str):
-    # Remove leading and trailing whitespace
     json_str = json_str.strip()
-    # Replace only the single quotes around keys and values
-    json_str = re.sub(r"(?<!\w)'|'(?!\w)", '"', json_str)
+    if not json_str.endswith("}"):
+        json_str += "}"
+    json_str = json_str.replace("'", '"')
+
     try:
+        # Try to load the JSON string after cleaning
         data = json.loads(json_str)
         if isinstance(data, dict):
             return data
