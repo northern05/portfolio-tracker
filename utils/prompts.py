@@ -1,3 +1,25 @@
+final_price_movements_prompt = """Generate a final for specified Token ticker report based on provided data from users message
+###Output Format###
+#### Price Moves
+<content> / up to 1 short sentence maximum 200 symbols.
+Do not add data that is not related to price movements here.
+MAXIMUM 200 symbols without links.
+[Active source links at the end].
+ADD all active links in the end
+"""
+
+final_updates_prompt = """Generate a final report for specified Token ticker based on provided data from users message.
+If No updates - write "No updates"
+###Output Format###
+#### Updates (do not include any data about price moves here, only investment, ecosystem updates, general news and major events)
+<1. updates> / up to 1 short sentences per each news maximum 200 symbols.
+<2. updates> / up to 1 short sentences per each news maximum 200 symbols.
+<3. updates> / up to 1 short sentences per each news maximum 200 symbols.
+MAXIMUM 600 symbols without links.
+[Active source links at the end].
+ADD all active links in the end
+"""
+
 prompts = [{"price_movements": {
     "perplexity_prompt": """
             Retrieve news articles detailing actual price movements of %s strictly within %s and %s date range. Exclud any predictions or forecasts
@@ -8,12 +30,13 @@ prompts = [{"price_movements": {
             Exclude any predictions or speculative forecasts.
             Please return only high-quality sources. If any content is behind paywalls, summarize key points.
             [Active source links at the end].""",
-    "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates "
-                      "should be removed template format: For each categorized article, generate a concise summary that includes: "
-                      "- The headline - A brief description of the event (including the event date) "
-                      "- Direct source link(s) Format the final report with the following structure: "
-                      "#### Price Moves [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
-                      "[Active source links at the end]. Maximum 200 symbols.",
+    # "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates "
+    #                   "should be removed template format: For each categorized article, generate a concise summary that includes: "
+    #                   "- The headline - A brief description of the event (including the event date) "
+    #                   "- Direct source link(s) Format the final report with the following structure: "
+    #                   "#### Price Moves [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
+    #                   "[Active source links at the end]. Maximum 200 symbols.",
+    "chatgpt_prompt": final_price_movements_prompt,
     "title": "Price Moves",
     "check": "Find some news about price movements about $%s?"
 },
@@ -21,12 +44,13 @@ prompts = [{"price_movements": {
         "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between %s and %s."
                              "Ensure the target the event occurrence dates (not the publication dates). "
                              "Include language-agnostic keywords since all languages should be accepted (non-English articles will later be translated to English) [Source links at the end]",
-        "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: "
-                          "For each categorized article, generate a concise summary that includes: "
-                          "- The headline - A brief description of the event (including the event date) "
-                          "- Direct source link(s) Format the final report with the following structure: "
-                          "#### Updates [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
-                          "[Active source links at the end]. Maximum 500 symbols.",
+        # "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: "
+        #                   "For each categorized article, generate a concise summary that includes: "
+        #                   "- The headline - A brief description of the event (including the event date) "
+        #                   "- Direct source link(s) Format the final report with the following structure: "
+        #                   "#### Updates [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
+        #                   "[Active source links at the end]. Maximum 500 symbols.",
+        "chatgpt_prompt": final_updates_prompt,
         "msg": """Updates:
         Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
         Ensure the focus is on event occurrence dates, that occurred between %s and %s.
@@ -60,28 +84,6 @@ keywords = f"""
             - **Whale Activity**
             - **Futures Launch**
             """
-
-final_price_movements_prompt = """Generate a final for specified Token ticker report based on provided data from users message
-###Output Format###
-#### Price Moves
-<content> / up to 1 short sentence maximum 200 symbols.
-Do not add data that is not related to price movements here.
-MAXIMUM 200 symbols without links.
-[Active source links at the end].
-ADD all active links in the end
-"""
-
-final_updates_prompt = """Generate a final report for specified Token ticker based on provided data from users message.
-If No updates - write "No updates"
-###Output Format###
-#### Updates (do not include any data about price moves here, only investment, ecosystem updates, general news and major events)
-<1. updates> / up to 1 short sentences per each news maximum 200 symbols.
-<2. updates> / up to 1 short sentences per each news maximum 200 symbols.
-<3. updates> / up to 1 short sentences per each news maximum 200 symbols.
-MAXIMUM 600 symbols without links.
-[Active source links at the end].
-ADD all active links in the end
-"""
 
 twikit_prompt = """
 Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
