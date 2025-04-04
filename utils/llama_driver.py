@@ -1,7 +1,11 @@
 import requests
+from pydantic import BaseModel
 
 twitter_post_types = ("bullish", "fud")
 
+class AnswerFormat(BaseModel):
+    twitter_user_id: str
+    twitter_id: str
 
 class LlamaDriver:
     def __init__(self, base_url: str):
@@ -28,7 +32,8 @@ class LlamaDriver:
     def get_bullish_fud(self, symbol: str, post_data: dict, prompt: str, twitt_type: str):
         message = f"Token Ticker: ${symbol.upper()} \n Type of witter post to be returned: ${twitt_type.upper()} \nPosts: {post_data}"
 
-        data = {"prompt": prompt, "msg": message}
+        data = {"prompt": prompt, "msg": message, "response_format": {"type": "json_schema", "json_schema": {"schema": AnswerFormat.model_json_schema()},
+    },}
         response = requests.post(url=self.BASE_URL, json=data)
         if response.status_code == 200:
             twitt = response.json().get("response").removesuffix("</s>").replace('\n', ' \n ')
