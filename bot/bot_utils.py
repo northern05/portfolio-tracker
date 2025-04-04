@@ -63,6 +63,10 @@ def escape_markdown(text):
 
 
 def format_urls_in_report(report):
+    pattern = r'\[0_system\]|\[0_q_\d+\]|0_a_\d+'
+    report = re.sub(pattern, '', report)
+    report = re.sub(r'\s*,\s*', ' ', report).strip()
+
     # Regular expression pattern to match URLs
     url_pattern = re.compile(r'https?://\S+')
 
