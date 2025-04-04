@@ -22,7 +22,7 @@ class PerplexityDriver:
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
-            web_search_options={"search_context_size": "low"}
+            web_search_options={"search_context_size": "high"}
         )
         return response.choices[0].message.content
 
