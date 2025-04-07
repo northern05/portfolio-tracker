@@ -22,14 +22,11 @@ ADD all active links in the end
 
 prompts = {"price_movements": {
     "perplexity_prompt": """
-            Retrieve news articles detailing actual price movements of %s strictly within %s and %s date range. Exclud any predictions or forecasts
-            - show me all links when you get information
-            - [Active source source links at the end]""",
+            Retrieve news articles detailing actual price movements of %s strictly within %s and %s date range. Exclude any predictions or forecasts""",
     "msg": """Price Movements & Market Trends:
             Identify articles discussing past price movements and volatility for %s, %s, %s that occurred between %s and %s.
             Exclude any predictions or speculative forecasts.
-            Please return only high-quality sources. If any content is behind paywalls, summarize key points.
-            [Active source links at the end].""",
+            Please return only high-quality sources. If any content is behind paywalls, summarize key points.""",
     # "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates "
     #                   "should be removed template format: For each categorized article, generate a concise summary that includes: "
     #                   "- The headline - A brief description of the event (including the event date) "

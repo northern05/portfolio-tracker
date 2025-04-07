@@ -138,13 +138,13 @@ async def create_report(
 async def generate_full_report(
         data: PortfolioResponseExtended,
 ):
-    message = f"""Generate report according to base prompt rules. Token ticker: {data.symbol}, 
-                data on which the report should be based: {data.twitter_news}.
-                Remove duplicate news, leaving only one."""
-    data.related_news = llama.send_message(
-        message=message,
-        prompt=prompts.final_updates_prompt
-    ).removesuffix("</s>")
+    # message = f"""Generate report according to base prompt rules. Token ticker: {data.symbol},
+    #             data on which the report should be based: {data.twitter_news}.
+    #             Remove duplicate news, leaving only one."""
+    # data.related_news = llama.send_message(
+    #     message=message,
+    #     prompt=prompts.final_updates_prompt
+    # ).removesuffix("</s>")
     message = f"""Generate report according to base prompt rules. Token ticker: {data.symbol}, 
                 data on which the report should be based: {data.price_movements}."""
     data.price_movements = llama.send_message(
