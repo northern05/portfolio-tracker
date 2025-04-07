@@ -3,9 +3,6 @@ final_price_movements_prompt = """Generate a final for specified Token ticker re
 #### Price Moves
 <content> / up to 1 short sentence maximum 200 symbols.
 Do not add data that is not related to price movements here.
-MAXIMUM 200 symbols without links.
-[Active source links at the end].
-ADD all active links in the end
 """
 
 final_updates_prompt = """Generate a final report for specified Token ticker based on provided data from users message.
