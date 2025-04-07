@@ -279,7 +279,7 @@ async def get_report(callback: types.CallbackQuery):
         if price_movements:
             # formated_urls = format_urls_in_report(price_movements)
             escaped_report = escape_markdown(price_movements).removesuffix("</s>")
-            await callback.message.answer(f"📰{escaped_report}", parse_mode='MarkdownV2',
+            await callback.message.answer(f"📰 *Price movements: {escaped_report}*", parse_mode='MarkdownV2',
                                           disable_web_page_preview=True)
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
