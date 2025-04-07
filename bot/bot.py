@@ -263,9 +263,9 @@ async def get_report(callback: types.CallbackQuery):
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
-        formated_urls = format_urls_in_report(data.get('related_news', 'No news available.'))
-        escaped_report = escape_markdown(
-            formated_urls)  # f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
+        news = data.get('related_news') if data.get('related_news') else data.get('twitter_news')
+        # formated_urls = format_urls_in_report(news)
+        escaped_report = escape_markdown(news)  # f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
         price = data.get("current_price", "Undefined").get("price_usd", "N/A")
         # ✅ Send news & price separately
         await bot.delete_message(
@@ -277,8 +277,8 @@ async def get_report(callback: types.CallbackQuery):
                                       disable_web_page_preview=True)
         price_movements = data.get('price_movements')
         if price_movements:
-            formated_urls = format_urls_in_report(price_movements)
-            escaped_report = escape_markdown(formated_urls)
+            # formated_urls = format_urls_in_report(price_movements)
+            escaped_report = escape_markdown(price_movements).removesuffix("</s>")
             await callback.message.answer(f"📰{escaped_report}", parse_mode='MarkdownV2',
                                           disable_web_page_preview=True)
 

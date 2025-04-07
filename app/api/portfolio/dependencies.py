@@ -76,6 +76,8 @@ async def get_sentiment_score(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 
 ) -> SentimentScore:
+    bullish = None
+    fud = None
     portfolio = await crud.get_by_symbol(session=session, symbol=symbol)
     cash_data = await redis_db.get(f"{portfolio.symbol}_sentiment")
     if cash_data:
@@ -90,11 +92,15 @@ async def get_sentiment_score(
     bullish_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
                                          prompt=prompts.bullish_fud_prompts.get("bullish"),
                                          twitt_type="Bullish")
-    bullish = await create_twitt_url(data=parse_json_string(bullish_data))
+    bullish_json = parse_json_string(bullish_data)
+    if bullish_json:
+        bullish = await create_twitt_url(data=bullish_json)
     fud_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
                                      prompt=prompts.bullish_fud_prompts.get("fud"),
                                      twitt_type="Bearish/FUD")
-    fud = await create_twitt_url(data=parse_json_string(fud_data))
+    fud_json = parse_json_string(fud_data)
+    if fud_json:
+        fud = await create_twitt_url(data=fud_json)
     response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data

@@ -110,4 +110,12 @@ def parse_json_string(json_str):
         else:
             raise ValueError("JSON does not contain a single dictionary.")
     except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON format: {e}")
+        match = re.search(r'\{.*\}', json_str)  # Non-greedy match to capture the whole dict
+
+        if match:
+            json_string = match.group(0)
+            try:
+                data_dict = json.loads(json_string)
+                return data_dict
+            except json.JSONDecodeError:
+                raise ValueError(f"Invalid JSON format: {e}")
