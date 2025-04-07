@@ -20,7 +20,7 @@ MAXIMUM 600 symbols without links.
 ADD all active links in the end
 """
 
-prompts = [{"price_movements": {
+prompts = {"price_movements": {
     "perplexity_prompt": """
             Retrieve news articles detailing actual price movements of %s strictly within %s and %s date range. Exclud any predictions or forecasts
             - show me all links when you get information
@@ -40,25 +40,25 @@ prompts = [{"price_movements": {
     "title": "Price Moves",
     "check": "Find some news about price movements about $%s?"
 },
-    "related_news": {
-        "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between %s and %s."
-                             "Ensure the target the event occurrence dates (not the publication dates). "
-                             "Include language-agnostic keywords since all languages should be accepted (non-English articles will later be translated to English) [Source links at the end]",
-        # "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: "
-        #                   "For each categorized article, generate a concise summary that includes: "
-        #                   "- The headline - A brief description of the event (including the event date) "
-        #                   "- Direct source link(s) Format the final report with the following structure: "
-        #                   "#### Updates [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
-        #                   "[Active source links at the end]. Maximum 500 symbols.",
-        "chatgpt_prompt": final_updates_prompt,
-        "msg": """Updates:
-        Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
-        Ensure the focus is on event occurrence dates, that occurred between %s and %s.
-        Please return only high-quality sources. If any content is behind paywalls, summarize key points.
-        [Active source links at the end].""",
-        "title": "Updates",
-        "check": "Is there any recent news about %s? Please answer with 'yes' or 'no' only."
-    },
+    # "related_news": {
+    #     "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between %s and %s."
+    #                          "Ensure the target the event occurrence dates (not the publication dates). "
+    #                          "Include language-agnostic keywords since all languages should be accepted (non-English articles will later be translated to English) [Source links at the end]",
+    #     # "chatgpt_prompt": "all this news should be drawn up in the form of a template report and duplicates should be removed template format: "
+    #     #                   "For each categorized article, generate a concise summary that includes: "
+    #     #                   "- The headline - A brief description of the event (including the event date) "
+    #     #                   "- Direct source link(s) Format the final report with the following structure: "
+    #     #                   "#### Updates [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. "
+    #     #                   "[Active source links at the end]. Maximum 500 symbols.",
+    #     "chatgpt_prompt": final_updates_prompt,
+    #     "msg": """Updates:
+    #     Find news about %s, %s, %s significant developments, such as partnerships, regulations, technological updates, or security incidents (hacks, exploits).
+    #     Ensure the focus is on event occurrence dates, that occurred between %s and %s.
+    #     Please return only high-quality sources. If any content is behind paywalls, summarize key points.
+    #     [Active source links at the end].""",
+    #     "title": "Updates",
+    #     "check": "Is there any recent news about %s? Please answer with 'yes' or 'no' only."
+    # },
 
     # "investment_landscape": {
     #     "perplexity_prompt": """
@@ -74,7 +74,7 @@ prompts = [{"price_movements": {
     #     "title": "Investment Landscape",
     #     "check": "Is there any recent investment landscape about %s? Please answer with 'yes' or 'no' only."
     # }
-}]
+}
 
 keywords = f"""
             Language-agnostic keywords for searching related news include:
@@ -93,6 +93,6 @@ Answer in one short sentence.
 """
 
 bullish_fud_prompts = {
-    "bullish": "You are sentiment analyzing agent. Return TOP 1 bullish post based on posts data provided in JSON format for specified Token ticker. Use engagement metrics to pick the post from the most Bullish ones. Use output format for response: {'twitter_user_id': <twitter_user_id>, 'twitter_id': <twitter_id>} \n###########################################",
-    "fud": "You are sentiment analyzing agent. Return TOP 1 Bearish/FUD post based on posts data provided in JSON format for specified Token ticker. Use engagement metrics to pick the post from the most Bearish/FUD ones. Use output format for response: {'twitter_user_id': <twitter_user_id>, 'twitter_id': <twitter_id>} \n###########################################"
+    "bullish": "You are sentiment analyzing agent. Return TOP 1 bullish post based on posts data provided in JSON format for specified Token ticker. Use engagement metrics to pick the post from the most Bullish ones. Use output format for response: {'twitter_user_id': <twitter_user_id>, 'twitter_id': <twitter_id>}, you can answer only these JSON format. \n###########################################",
+    "fud": "You are sentiment analyzing agent. Return TOP 1 Bearish/FUD post based on posts data provided in JSON format for specified Token ticker. Use engagement metrics to pick the post from the most Bearish/FUD ones. Use output format for response: {'twitter_user_id': <twitter_user_id>, 'twitter_id': <twitter_id>}, you can answer only these JSON format. \n###########################################"
 }

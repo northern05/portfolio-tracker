@@ -242,20 +242,20 @@ async def get_report(callback: types.CallbackQuery):
     # ✅ Immediately acknowledge the callback query to prevent timeout
     await callback.answer("📊 Generating report, please wait...", show_alert=False)
     # Fetch chart image
-    response = requests.get(f"{API_URL}/selected/chart", params={"symbol": coin})
-    if response.status_code == 200:
-        image_path = "chart.png"
-        with open(image_path, "wb") as f:
-            f.write(response.content)
-
-        # ✅ Send the chart image
-        await bot.send_photo(chat_id=callback.from_user.id, photo=FSInputFile(image_path),
-                             caption="📊 *Price movements*", parse_mode='Markdown')
-
-        # Remove image after sending
-        os.remove(image_path)
-    else:
-        await callback.message.answer("❌ Failed to generate the chart. Try again later.")
+    # response = requests.get(f"{API_URL}/selected/chart", params={"symbol": coin})
+    # if response.status_code == 200:
+    #     image_path = "chart.png"
+    #     with open(image_path, "wb") as f:
+    #         f.write(response.content)
+    #
+    #     # ✅ Send the chart image
+    #     await bot.send_photo(chat_id=callback.from_user.id, photo=FSInputFile(image_path),
+    #                          caption="📊 *Price movements*", parse_mode='Markdown')
+    #
+    #     # Remove image after sending
+    #     os.remove(image_path)
+    # else:
+    #     await callback.message.answer("❌ Failed to generate the chart. Try again later.")
     price = 0
     processing_message = await callback.message.answer_animation(animation=GIF_URL,
                                                                  caption="Processing your request...")
@@ -275,10 +275,12 @@ async def get_report(callback: types.CallbackQuery):
 
         await callback.message.answer(f"📰 *News by {coin}:* \n{escaped_report}", parse_mode='MarkdownV2',
                                       disable_web_page_preview=True)
-        formated_urls = format_urls_in_report(data.get('price_movements', 'No news available.'))
-        escaped_report = escape_markdown(formated_urls)
-        await callback.message.answer(f"📰{escaped_report}", parse_mode='MarkdownV2',
-                                      disable_web_page_preview=True)
+        price_movements = data.get('price_movements')
+        if price_movements:
+            formated_urls = format_urls_in_report(price_movements)
+            escaped_report = escape_markdown(formated_urls)
+            await callback.message.answer(f"📰{escaped_report}", parse_mode='MarkdownV2',
+                                          disable_web_page_preview=True)
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:

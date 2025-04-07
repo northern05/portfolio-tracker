@@ -112,23 +112,22 @@ async def create_report(
         data: PortfolioResponseExtended,
         twitter: str = None
 ):
-    for block in prompts.prompts:
-        for k, v in block.items():
-            perplexity_check = perplexity_driver.chat_without_streaming(
-                message=f"Answer only one word if any news about{full_token_name}",
-                prompt=v.get("check") % symbol
+    for k, v in prompts.prompts.items():
+        perplexity_check = perplexity_driver.chat_without_streaming(
+            message=f"Answer only one word if any news about{full_token_name}",
+            prompt=v.get("check") % symbol
+        )
+        if perplexity_check.lower() == "no":
+            setattr(data, k, "No updates")
+        else:
+            perplexity_result = perplexity_driver.chat_without_streaming(
+                message=v.get("msg") % (
+                    symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
+                prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
             )
-            if perplexity_check.lower() == "no":
-                setattr(data, k, "No updates")
-            else:
-                perplexity_result = perplexity_driver.chat_without_streaming(
-                    message=v.get("msg") % (
-                        symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
-                    prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
-                )
-                llama_processing = llama.send_message(message=perplexity_result.removesuffix("</s>"),
-                                                      prompt=v.get("chatgpt_prompt"))
-                setattr(data, k, llama_processing)
+            llama_processing = llama.send_message(message=perplexity_result.removesuffix("</s>"),
+                                                  prompt=v.get("chatgpt_prompt"))
+            setattr(data, k, llama_processing)
     twitts_over_asset = await twitter_scraper.fetch_tweets(protocol_name=twitter.split("/")[-1])
     if twitts_over_asset:
         msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {twitts_over_asset}"
@@ -140,7 +139,7 @@ async def generate_full_report(
         data: PortfolioResponseExtended,
 ):
     message = f"""Generate report according to base prompt rules. Token ticker: {data.symbol}, 
-                data on which the report should be based: {data.related_news}, {data.twitter_news if data.twitter_news else ""}.
+                data on which the report should be based: {data.twitter_news}.
                 Remove duplicate news, leaving only one."""
     data.related_news = llama.send_message(
         message=message,
