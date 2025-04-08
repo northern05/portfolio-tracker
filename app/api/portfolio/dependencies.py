@@ -237,4 +237,4 @@ async def get_dataset(session: AsyncSession = Depends(db_helper.scoped_session_d
             file.write("=" * 100)
             file.write("\n" + f"TWITS {token.symbol}" + "\n")
             file.write(str(twitts_over_asset))
-            await asyncio.sleep(600)
+            await asyncio.sleep(1800)
