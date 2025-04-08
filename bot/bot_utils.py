@@ -60,7 +60,7 @@ def escape_markdown(text):
     """
     try:
         escape_chars = r'_*[]()~`>#+-=|{}.!'
-        result = re.sub(r'([%s])' % re.escape(escape_chars), r'\\\1', text)
+        result = re.sub(r'([%s])' % re.escape(escape_chars), r'\\\1', text).replace("</s>", "")
     except Exception as e:
         return None
     return result
