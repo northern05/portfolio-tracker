@@ -58,8 +58,12 @@ def escape_markdown(text):
     """
     Escapes special characters for Telegram MarkdownV2 formatting.
     """
-    escape_chars = r'_*[]()~`>#+-=|{}.!'
-    return re.sub(r'([%s])' % re.escape(escape_chars), r'\\\1', text)
+    try:
+        escape_chars = r'_*[]()~`>#+-=|{}.!'
+        result = re.sub(r'([%s])' % re.escape(escape_chars), r'\\\1', text),
+    except Exception as e:
+        return None
+    return result
 
 
 def format_urls_in_report(report):

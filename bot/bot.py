@@ -272,9 +272,12 @@ async def get_report(callback: types.CallbackQuery):
             chat_id=processing_message.chat.id,
             message_id=processing_message.message_id
         )
-
-        await callback.message.answer(f"📰 *News by {coin}:* \n{escaped_report}", parse_mode='MarkdownV2',
-                                      disable_web_page_preview=True)
+        if escaped_report:
+            await callback.message.answer(f"📰 *News by {coin}:* \n{escaped_report}", parse_mode='MarkdownV2',
+                                          disable_web_page_preview=True)
+        else:
+            await callback.message.answer(f"📰 *No updates over {coin}*", parse_mode='MarkdownV2',
+                                          disable_web_page_preview=True)
         price_movements = data.get('price_movements')
         if price_movements:
             # formated_urls = format_urls_in_report(price_movements)
