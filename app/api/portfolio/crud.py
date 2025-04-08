@@ -60,6 +60,12 @@ async def get_by_symbol(session: AsyncSession, symbol: str) -> Portfolio | None:
     return portfolio
 
 
+async def get_all(session: AsyncSession):
+    result: Result = await session.execute(select(Portfolio))
+    portfolios = result.scalars().all()
+    return portfolios
+
+
 async def update_portfolio(
         session: AsyncSession,
         portfolio: Portfolio,

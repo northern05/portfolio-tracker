@@ -88,6 +88,20 @@ async def get_selected_portfolio(
 
 
 @router.get(
+    "/dataset",
+    status_code=status.HTTP_200_OK,
+)
+async def get_dataset(
+        result=Depends(dependencies.get_dataset)
+):
+    """
+    Endpoint to get selected portfolio over user
+    :return: portfolio extended schema
+    """
+    return result
+
+
+@router.get(
     "/selected/chart",
     status_code=status.HTTP_200_OK,
     response_model=bytes,
