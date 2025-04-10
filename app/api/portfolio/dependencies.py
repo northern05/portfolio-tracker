@@ -92,6 +92,12 @@ async def get_sentiment_score(
 
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
     for post in sentiment_score:
+        is_post_about_crypto = llama.send_message(
+            prompt="You are data analyzer to define relation data to crypto asset.",
+            message=f"Process data: {post} and define is this data related to crypto asset ${portfolio.symbol} or {portfolio.symbol} project. #Answer one word only: Yes or Not.")
+        clean_response = re.sub(r'[^a-zA-Z\s]', '', is_post_about_crypto.replace("</s>", "")).lower()
+        if clean_response == 'not':
+            sentiment_score.remove(post)
         score = llama.send_message(
             prompt=prompts.bullish_fud_score_prompt % portfolio.symbol,
             message=f"Score twitter post about ${portfolio.symbol}: {post}. #Answer only number!"
@@ -113,7 +119,7 @@ def extract_rating(text):
     if match:
         return match.group(1)  # Return the captured digits
     else:
-        return None
+        return 0
 
 
 async def create_twitt_url(data: dict):
