@@ -102,7 +102,7 @@ async def get_sentiment_score(
             prompt=prompts.bullish_fud_score_prompt % portfolio.symbol,
             message=f"Score twitter post about ${portfolio.symbol}: {post}. #Answer only number!"
         )
-        post.update({"score": int(extract_rating(score))})
+        post["score"] = int(extract_rating(score))
     sorted_score_list = sorted(sentiment_score, key=lambda x: x["score"], reverse=True)
     bullish_post = sorted_score_list[0]
     fud_post = sorted_score_list[-1]
