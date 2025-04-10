@@ -45,8 +45,8 @@ class PerplexitySettings(BaseSettings):
 
 
 class TwitterCredentialsSettings(BaseSettings):
-    ACCOUNTS: list = os.environ.get("TWITTER_ACCOUNTS")
-
+    accounts: str = os.environ.get("TWITTER_ACCOUNTS")
+    ACCOUNTS: list = json.loads(accounts)
 
 
 class LLamaSettings(BaseSettings):

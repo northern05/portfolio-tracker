@@ -1,5 +1,6 @@
 from redis.asyncio import Redis
-from app.core.config import cmc_config, perplexity_config, elfa_config, redis_config, llama_config, twitter_account_config
+from app.core.config import cmc_config, perplexity_config, elfa_config, redis_config, llama_config, \
+    twitter_account_config
 from utils.cmc_driver import CoinMarketCapDriver
 from utils.perplexity_driver import PerplexityDriver
 from utils.elfa_driver import ElfaDriver
