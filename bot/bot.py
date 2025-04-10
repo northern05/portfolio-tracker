@@ -263,7 +263,7 @@ async def get_report(callback: types.CallbackQuery):
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
-        news = data.get('related_news') if data.get('related_news') else data.get('twitter_news')
+        news = data.get('related_news').replace("</s>", "") if data.get('related_news') else data.get('twitter_news')
         # formated_urls = format_urls_in_report(news)
         escaped_report = escape_markdown(news)  # f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
         price = data.get("current_price", "Undefined").get("price_usd", "N/A")
@@ -278,7 +278,7 @@ async def get_report(callback: types.CallbackQuery):
         else:
             await callback.message.answer(f"📰 *No updates over {coin}*", parse_mode='MarkdownV2',
                                           disable_web_page_preview=True)
-        price_movements = data.get('price_movements')
+        price_movements = data.get('price_movements').replace("</s>", "")
         if price_movements:
             # formated_urls = format_urls_in_report(price_movements)
             escaped_report = escape_markdown(price_movements)
@@ -291,8 +291,10 @@ async def get_report(callback: types.CallbackQuery):
         bullish = data.get('bullish')
         fud = data.get('fud')
         if bullish or fud: await callback.message.answer(f"📊 *X/Twitter:*", parse_mode='Markdown')
-        if bullish: await callback.message.answer(f"\n [TOP 1 Bullish]({bullish})", parse_mode='MarkdownV2')
-        if bullish != fud: await callback.message.answer(f"\n [TOP 1 Bearish/FUD]({fud})", parse_mode='MarkdownV2')
+        if bullish: await callback.message.answer(f"\n [TOP 1 Bullish]({bullish})", parse_mode='MarkdownV2',
+                                          disable_web_page_preview=True)
+        if bullish != fud: await callback.message.answer(f"\n [TOP 1 Bearish/FUD]({fud})", parse_mode='MarkdownV2',
+                                          disable_web_page_preview=True)
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
     await callback.message.answer(f"💰 *Current price:* {round(price, 2)} USD", parse_mode='Markdown')
