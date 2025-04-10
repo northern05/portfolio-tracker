@@ -1,4 +1,5 @@
 import asyncio
+import re
 from datetime import datetime, timedelta
 import json
 from typing import Annotated
@@ -77,34 +78,42 @@ async def get_sentiment_score(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 
 ) -> SentimentScore:
-    bullish = None
-    fud = None
     portfolio = await crud.get_by_symbol(session=session, symbol=symbol)
-    cash_data = await redis_db.get(f"{portfolio.symbol}_sentiment")
-    if cash_data:
-        return SentimentScore.parse_obj(json.loads(cash_data.decode("UTF-8")))
     if not portfolio:
         await session.close()
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=errors.portfolio_errors.PROJECT_NOT_FOUND
         )
+
+    cash_data = await redis_db.get(f"{portfolio.symbol}_sentiment")
+    if cash_data:
+        return SentimentScore.parse_obj(json.loads(cash_data.decode("UTF-8")))
+
     sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
-    bullish_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
-                                         prompt=prompts.bullish_fud_prompts.get("bullish"),
-                                         twitt_type="Bullish")
-    bullish_json = parse_json_string(bullish_data)
-    if bullish_json:
-        bullish = await create_twitt_url(data=bullish_json)
-    fud_data = llama.get_bullish_fud(symbol=symbol, post_data=sentiment_score,
-                                     prompt=prompts.bullish_fud_prompts.get("fud"),
-                                     twitt_type="Bearish/FUD")
-    fud_json = parse_json_string(fud_data)
-    if fud_json:
-        fud = await create_twitt_url(data=fud_json)
+    for post in sentiment_score:
+        score = llama.send_message(
+            prompt=prompts.bullish_fud_score_prompt % portfolio.symbol,
+            message=f"Score twitter post about ${portfolio.symbol}: {post}. #Answer only number!"
+        )
+        post.update({"score": int(extract_rating(score))})
+    sorted_score_list = sorted(sentiment_score, key=lambda x: x["score"], reverse=True)
+    bullish_post = sorted_score_list[0]
+    fud_post = sorted_score_list[-1]
+    bullish = await create_twitt_url(data=bullish_post)
+    fud = await create_twitt_url(data=fud_post)
     response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
+
+def extract_rating(text):
+    """Extracts the rating number from the LLM response."""
+
+    match = re.search(r'(?:\w+: )?(\d+)', text)  # Find digits before " out of"
+    if match:
+        return match.group(1)  # Return the captured digits
+    else:
+        return None
 
 
 async def create_twitt_url(data: dict):

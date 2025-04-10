@@ -41,7 +41,5 @@ llama = LlamaDriver(base_url=llama_config.LLAMA_URL)
 
 # --------- Initialize Twitter Scraper -----------------------
 twitter_scraper = TwitterScraper(
-    username=twitter_account_config.TWITTER_USERNAME,
-    password=twitter_account_config.TWITTER_PASSWORD,
-    email=twitter_account_config.TWITTER_EMAIL
+    accounts=twitter_account_config.ACCOUNTS
 )

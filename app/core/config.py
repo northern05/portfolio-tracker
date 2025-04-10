@@ -45,9 +45,7 @@ class PerplexitySettings(BaseSettings):
 
 
 class TwitterCredentialsSettings(BaseSettings):
-    TWITTER_USERNAME: str = os.environ.get("TWITTER_USERNAME")
-    TWITTER_EMAIL: str = os.environ.get("TWITTER_EMAIL")
-    TWITTER_PASSWORD: str = os.environ.get("TWITTER_PASSWORD")
+    ACCOUNTS: list = os.environ.get("TWITTER_ACCOUNTS")
 
 
 

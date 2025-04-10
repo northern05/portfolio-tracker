@@ -13,8 +13,7 @@ If No updates - write "No updates"
 <2. updates> / up to 1 short sentences per each news maximum 200 symbols.
 <3. updates> / up to 1 short sentences per each news maximum 200 symbols.
 MAXIMUM 600 symbols without links.
-[Active source links at the end].
-ADD all active links in the end
+#Active source links at the end.
 """
 
 prompts = {"price_movements": {
@@ -53,31 +52,7 @@ prompts = {"price_movements": {
     #     "title": "Updates",
     #     "check": "Is there any recent news about %s? Please answer with 'yes' or 'no' only."
     # },
-
-    # "investment_landscape": {
-    #     "perplexity_prompt": """
-    #         Find news articles about investment landscape and ecosystem updates for %s:
-    #         - within %s and %s date range
-    #         - show me all links when you get information
-    #         - [Source links at the end]""",
-    #     "msg": """Investment & Ecosystem Updates:
-    #         Retrieve news related to market adoption, investor sentiment, and ecosystem developments (e.g., institutional interest, major token listings, DeFi integrations) for %s, %s, %s that occurred between %s and %s.
-    #         Please return only high-quality sources. If any content is behind paywalls, summarize key points.
-    #         [Source links at the end].""",
-    #     "chatgpt_prompt": """all this news should be drawn up in the form of a template report and duplicates should be removed. news other than the Investment Landscape should be removed template format: For each categorized article, generate a concise summary that includes: - The headline - A brief description of the event (including the event date) - Direct source link(s) Format the final report with the following structure: #### *Investment Landscape* [Headline] (Date) – [Concise summary in 2-3 sentences, combining all news in one paragraph]. [Source links at the end]. Maximum 1000 symbols.""",
-    #     "title": "Investment Landscape",
-    #     "check": "Is there any recent investment landscape about %s? Please answer with 'yes' or 'no' only."
-    # }
 }
-
-keywords = f"""
-            Language-agnostic keywords for searching related news include:
-            - **Cryptocurrency**
-            - **Blockchain**
-            - **Market Trends**
-            - **Whale Activity**
-            - **Futures Launch**
-            """
 
 twikit_prompt = """
 Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
@@ -86,7 +61,4 @@ Highlight any significant events or announcements. Also, summarize how the crypt
 Answer in one short sentence.
 """
 
-bullish_fud_prompts = {
-    "bullish": "You are sentiment analyzing agent. Return TOP 1 bullish post based on posts data provided in JSON format for specified Token ticker. Use engagement metrics to pick the post from the most Bullish ones. Use output format for response: {'twitter_user_id': <twitter_user_id>, 'twitter_id': <twitter_id>}, you can answer only these JSON format. \n###########################################",
-    "fud": "You are sentiment analyzing agent. Return TOP 1 Bearish/FUD post based on posts data provided in JSON format for specified Token ticker. Use engagement metrics to pick the post from the most Bearish/FUD ones. Use output format for response: {'twitter_user_id': <twitter_user_id>, 'twitter_id': <twitter_id>}, you can answer only these JSON format. \n###########################################"
-}
+bullish_fud_score_prompt = "Process data, score twitter post from 1 to 100, where score 1 is TOP 1 Bearish/FUD, and score 100 is TOP 1 Bullish post based on post data provided in JSON format for specified %s. Use engagement metrics to rate the post. #Answer only number."
