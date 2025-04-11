@@ -281,7 +281,7 @@ async def get_report(callback: types.CallbackQuery):
         data = response.json()
         bullish = data.get('bullish')
         fud = data.get('fud')
-        message = f"📊 *X/Twitter:* \n [TOP 1 Bullish]({bullish}) \n [TOP 1 Bearish/FUD]({fud}) \n 💰 *Current price:* {round(price, 5)} USD"
+        message = f"📊 *X/Twitter:* \n [TOP 1 Bullish]({escape_markdown(bullish)}) \n [TOP 1 Bearish/FUD]({escape_markdown(fud)}) \n 💰 *Current price:* {round(price, 5)} USD"
         await callback.message.answer(message, parse_mode='MarkdownV2', disable_web_page_preview=True)
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
