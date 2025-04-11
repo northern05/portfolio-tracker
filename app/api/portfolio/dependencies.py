@@ -1,5 +1,6 @@
 import asyncio
 import re
+import ast
 from datetime import datetime, timedelta
 import json
 from typing import Annotated
@@ -89,25 +90,38 @@ async def get_sentiment_score(
     cash_data = await redis_db.get(f"{portfolio.symbol}_sentiment")
     if cash_data:
         return SentimentScore.parse_obj(json.loads(cash_data.decode("UTF-8")))
-
-    sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol)
+    full_token_name = coin_gecko_driver.get_data_over_coingecko_id(token_id=portfolio.coingecko_id).get("name")
+    cash_data = await redis_db.get(f"{portfolio.symbol}_elfa")
+    if not cash_data:
+        sentiment_score = elfa_driver.get_squeeze(symbol=portfolio.symbol, full_token_name=full_token_name)
+        await redis_db.set(f"{portfolio.symbol}_elfa", str(sentiment_score), ex=86400)
+    else:
+        sentiment_score = ast.literal_eval(cash_data.decode("UTF-8"))
     for post in sentiment_score:
         is_post_about_crypto = llama.send_message(
             prompt="You are data analyzer to define relation data to crypto asset.",
-            message=f"Process data: {post} and define is this data related to crypto asset ${portfolio.symbol} or {portfolio.symbol} project. #Answer one word only: Yes or Not.")
+            message=f"Process data: {post.get('content')} and define is this data related to crypto asset ${portfolio.symbol} or {full_token_name} project. #Answer one word only: Yes or Not.")
         clean_response = re.sub(r'[^a-zA-Z\s]', '', is_post_about_crypto.replace("</s>", "")).lower()
         if clean_response == 'not':
             sentiment_score.remove(post)
+            continue
         score = llama.send_message(
             prompt=prompts.bullish_fud_score_prompt % portfolio.symbol,
-            message=f"Score twitter post about ${portfolio.symbol}: {post}. #Answer only number!"
+            message=f"Score twitter post about ${portfolio.symbol} ({full_token_name} project): {post.get('content')}. #Answer only number!"
         )
         post["score"] = int(extract_rating(score))
-    sorted_score_list = sorted(sentiment_score, key=lambda x: x["score"], reverse=True)
-    bullish_post = sorted_score_list[0]
-    fud_post = sorted_score_list[-1]
-    bullish = await create_twitt_url(data=bullish_post)
-    fud = await create_twitt_url(data=fud_post)
+    sorted_score_list = sorted(sentiment_score, key=lambda x: x.get("score", 0), reverse=True)
+    bullish_post = llama.send_message(
+            prompt=prompts.top_1_bullish % portfolio.symbol,
+            message=f"Choose TOP 1 Bullish twitter post about ${portfolio.symbol} ({full_token_name} project): {sorted_score_list[:5]}."
+        )
+
+    fud_post = llama.send_message(
+        prompt=prompts.top_1_fud % portfolio.symbol,
+        message=f"Choose TOP 1 Bearish/FUD twitter post about ${portfolio.symbol} ({full_token_name} project): {sorted_score_list[-5:]}."
+    )
+    bullish = await create_twitt_url(data=json.loads(bullish_post.replace("</s>", "")))
+    fud = await create_twitt_url(data=json.loads(fud_post.replace("</s>", "")))
     response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
@@ -150,7 +164,12 @@ async def create_report(
         llama_processing = llama.send_message(message=perplexity_result.replace("</s>", ""),
                                               prompt=v.get("chatgpt_prompt"))
         setattr(data, k, llama_processing)
-    twitts_over_asset = await twitter_scraper.fetch_tweets(protocol_name=twitter.split("/")[-1])
+    cash_data = await redis_db.get(f"{symbol}_twitter_posts")
+    if not cash_data:
+        twitts_over_asset = await twitter_scraper.fetch_tweets(protocol_name=twitter.split("/")[-1])
+        await redis_db.set(f"{symbol}_twitter_posts", str(twitts_over_asset), ex=86400)
+    else:
+        twitts_over_asset = ast.literal_eval(cash_data.decode("UTF-8"))
     if twitts_over_asset:
         msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {twitts_over_asset}"
         data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt).replace("</s>", "")

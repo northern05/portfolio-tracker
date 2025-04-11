@@ -259,45 +259,32 @@ async def get_report(callback: types.CallbackQuery):
     price = 0
     processing_message = await callback.message.answer_animation(animation=GIF_URL,
                                                                  caption="Processing your request...")
-    # Fetch additional data (News & Price)
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
         news = data.get('related_news').replace("</s>", "") if data.get('related_news') else data.get('twitter_news')
+        price_movements = data.get('price_movements').replace("</s>", "")
+        escaped_prices = escape_markdown(price_movements)
         # formated_urls = format_urls_in_report(news)
-        escaped_report = escape_markdown(news)  # f"📰 *News by {coin}:* \n{data.get('full_report', 'No news available.')}"
+        escaped_report = escape_markdown(news)
         price = data.get("current_price", "Undefined").get("price_usd", "N/A")
-        # ✅ Send news & price separately
         await bot.delete_message(
             chat_id=processing_message.chat.id,
             message_id=processing_message.message_id
         )
-        if escaped_report:
-            await callback.message.answer(f"📰 *News by {coin}:* \n{escaped_report}", parse_mode='MarkdownV2',
-                                          disable_web_page_preview=True)
-        else:
-            await callback.message.answer(f"📰 *No updates over {coin}*", parse_mode='MarkdownV2',
-                                          disable_web_page_preview=True)
-        price_movements = data.get('price_movements').replace("</s>", "")
-        if price_movements:
-            # formated_urls = format_urls_in_report(price_movements)
-            escaped_report = escape_markdown(price_movements)
-            await callback.message.answer(f"📰 *Price movements:* {escaped_report}", parse_mode='MarkdownV2',
-                                          disable_web_page_preview=True)
+        message = f"📰 *News by {coin}:* \n{escaped_report}" if escaped_report else f"📰 *No updates over {coin}*"
+        message += f"\n 📰 *Price movements:* {escaped_prices}" if escaped_prices else ""
+        await callback.message.answer(message, parse_mode='MarkdownV2', disable_web_page_preview=True)
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
         bullish = data.get('bullish')
         fud = data.get('fud')
-        if bullish or fud: await callback.message.answer(f"📊 *X/Twitter:*", parse_mode='Markdown')
-        if bullish: await callback.message.answer(f"\n [TOP 1 Bullish]({bullish})", parse_mode='MarkdownV2',
-                                          disable_web_page_preview=True)
-        if bullish != fud: await callback.message.answer(f"\n [TOP 1 Bearish/FUD]({fud})", parse_mode='MarkdownV2',
-                                          disable_web_page_preview=True)
+        message = f"📊 *X/Twitter:* \n [TOP 1 Bullish]({bullish}) \n [TOP 1 Bearish/FUD]({fud}) \n 💰 *Current price:* {round(price, 5)} USD"
+        await callback.message.answer(message, parse_mode='MarkdownV2', disable_web_page_preview=True)
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
-    await callback.message.answer(f"💰 *Current price:* {round(price, 2)} USD", parse_mode='Markdown')
     await callback.message.answer("Maybe I can help you more?")
     await edit_portfolio_menu(callback.message)
 

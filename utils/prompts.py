@@ -61,4 +61,7 @@ Highlight any significant events or announcements. Also, summarize how the crypt
 Answer in one short sentence.
 """
 
-bullish_fud_score_prompt = "Process data, score twitter post from 1 to 100, where score 1 is TOP 1 Bearish/FUD, and score 100 is TOP 1 Bullish post based on post data provided in JSON format for specified %s. Use engagement metrics to rate the post. #Answer only number."
+bullish_fud_score_prompt = "Process data, score twitter post from 1 to 100, where score 1 is TOP 1 Bearish/FUD, and score 100 is TOP 1 Bullish post based on post data provided for specified %s. Use engagement metrics to rate the post. #Answer only number."
+
+top_1_bullish = "Process data, and choose TOP 1 Bullish post based on post data provided for specified %s. #Return chosen post in JSON format."
+top_1_fud = "Process data, and choose TOP 1 Bearish/FUD post based on post data provided for specified %s. #Return chosen post in JSON format."

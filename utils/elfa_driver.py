@@ -12,8 +12,8 @@ class ElfaDriver:
         pattern = rf"\b{symbol}\b"  # Ensure it's a standalone word
         return bool(re.search(pattern, post_text, re.IGNORECASE))
 
-    def get_squeeze(self, symbol: str):
-        all_tickers = [f"${symbol}", f"%23{symbol}", symbol]
+    def get_squeeze(self, symbol: str, full_token_name: str):
+        all_tickers = [f"${symbol}", f"%23{symbol}", symbol, full_token_name]
         tweets = []
         for ticker in all_tickers:
             result = self.get_top_posts(symbol=ticker)
@@ -26,8 +26,8 @@ class ElfaDriver:
 
         return filtered_tweets
 
-    def get_top_posts(self, symbol: str, time_window: str = "2d", page: int = 1,
-                      page_size: int = 25):
+    def get_top_posts(self, symbol: str, time_window: str = "7d", page: int = 1,
+                      page_size: int = 50):
         url = f'{self.ELFA_URL}/top-mentions?ticker={symbol}&timeWindow={time_window}&page={page}&pageSize={page_size}'
         headers = {
             'x-elfa-api-key': self.ELFA_API_KEY
