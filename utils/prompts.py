@@ -61,11 +61,11 @@ Identify mentions of cryptocurrency price updates, engagement levels (likes/retw
 Highlight any significant events or announcements. Also, summarize how the cryptocurrency community is reacting based on engagement metrics.
 If No updates - write "No updates"
 ###Output Format###
-#### Updates (do not include any data about price moves here, only investment, ecosystem updates, general news and major events)
-<1. updates> / up to 1 short sentences per each news maximum 100 symbols.
-<2. updates> / up to 1 short sentences per each news maximum 100 symbols.
-<3. updates> / up to 1 short sentences per each news maximum 100 symbols.
-MAXIMUM 600 symbols without links.
+#### Updates 
+<1. updates> / up to 1 short sentence.
+<2. updates> / up to 1 short sentence.
+<3. updates> / up to 1 short sentence.
+###MAXIMUM 300 symbols without links.
 """
 
 bullish_fud_score_prompt = "Process data, score twitter post from 1 to 100, where score 1 is TOP 1 Bearish/FUD, and score 100 is TOP 1 Bullish post based on post data provided for specified %s. Use engagement metrics to rate the post. #Answer only number."
