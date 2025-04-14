@@ -1,7 +1,8 @@
 final_price_movements_prompt = """Generate a final for specified Token ticker report based on provided data from users message
 ###Output Format###
 #### Price Moves
-<content> / up to 1 short sentence maximum 200 symbols.
+<content> / up to 1 short sentence.
+###Maximum 150 symbols.
 Do not add data that is not related to price movements here.
 """
 
@@ -58,7 +59,13 @@ twikit_prompt = """
 Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
 Identify mentions of cryptocurrency price updates, engagement levels (likes/retweets), and sentiment shifts. 
 Highlight any significant events or announcements. Also, summarize how the cryptocurrency community is reacting based on engagement metrics.
-Answer in one short sentence.
+If No updates - write "No updates"
+###Output Format###
+#### Updates (do not include any data about price moves here, only investment, ecosystem updates, general news and major events)
+<1. updates> / up to 1 short sentences per each news maximum 100 symbols.
+<2. updates> / up to 1 short sentences per each news maximum 100 symbols.
+<3. updates> / up to 1 short sentences per each news maximum 100 symbols.
+MAXIMUM 600 symbols without links.
 """
 
 bullish_fud_score_prompt = "Process data, score twitter post from 1 to 100, where score 1 is TOP 1 Bearish/FUD, and score 100 is TOP 1 Bullish post based on post data provided for specified %s. Use engagement metrics to rate the post. #Answer only number."

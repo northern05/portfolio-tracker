@@ -272,8 +272,8 @@ async def get_report(callback: types.CallbackQuery):
             chat_id=processing_message.chat.id,
             message_id=processing_message.message_id
         )
-        message = f"📰 *News by {coin}:* \n{escaped_report}" if escaped_report else f"📰 *No updates over {coin}*"
-        message += f"\n 📰 *Price movements:* {escaped_prices}" if escaped_prices else ""
+        message = f"📰 *News by {coin}:* \n {escaped_report} \n" if escaped_report else f"📰 *No updates over {coin}* \n"
+        message += f"\n 📰 *Price movements:* {escaped_prices} \n" if escaped_prices else ""
         await callback.message.answer(message, parse_mode='MarkdownV2', disable_web_page_preview=True)
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
@@ -284,7 +284,7 @@ async def get_report(callback: types.CallbackQuery):
         message = f"📊 *X/Twitter:* \n " \
                   f"[TOP 1 Bullish]({bullish}) \n " \
                   f"[TOP 1 Bearish/FUD]({fud}) \n " \
-                  f"💰 *Current price:* {escape_markdown(str(round(price, 5)))} USD"
+                  f" \n💰 *Current price:* {escape_markdown(str(round(price, 5)))} USD"
         await callback.message.answer(message, parse_mode='MarkdownV2', disable_web_page_preview=True)
     else:
         await callback.message.answer(f"❌ Error getting report for {coin}. Please try again.")
