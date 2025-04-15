@@ -1,7 +1,7 @@
 final_price_movements_prompt = """Generate a final for specified Token ticker report based on provided data from users message
 ###Output Format###
 #### Price Moves
-<content> / up to 1 short sentence.
+\n <content> / up to 1 short sentence.
 ###Maximum 150 symbols.
 Do not add data that is not related to price movements here.
 """
@@ -10,9 +10,9 @@ final_updates_prompt = """Generate a final report for specified Token ticker bas
 If No updates - write "No updates"
 ###Output Format###
 #### Updates (do not include any data about price moves here, only investment, ecosystem updates, general news and major events)
-<1. updates> / up to 1 short sentences per each news maximum 200 symbols.
-<2. updates> / up to 1 short sentences per each news maximum 200 symbols.
-<3. updates> / up to 1 short sentences per each news maximum 200 symbols.
+\n <1. updates> / up to 1 short sentences per each news maximum 200 symbols.
+\n <2. updates> / up to 1 short sentences per each news maximum 200 symbols.
+\n <3. updates> / up to 1 short sentences per each news maximum 200 symbols.
 MAXIMUM 600 symbols without links.
 #Active source links at the end.
 """
@@ -62,9 +62,9 @@ Highlight any significant events or announcements. Also, summarize how the crypt
 If No updates - write "No updates"
 ###Output Format###
 #### Updates 
-<1. updates> / up to 1 short sentence.
-<2. updates> / up to 1 short sentence.
-<3. updates> / up to 1 short sentence.
+\n <1. updates> / up to 1 short sentence.
+\n <2. updates> / up to 1 short sentence.
+\n <3. updates> / up to 1 short sentence.
 ###MAXIMUM 300 symbols without links.
 """
 
