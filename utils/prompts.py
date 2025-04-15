@@ -65,7 +65,8 @@ If No updates - write "No updates"
 \n <1. updates> / up to 1 short sentence.
 \n <2. updates> / up to 1 short sentence.
 \n <3. updates> / up to 1 short sentence.
-###MAXIMUM 300 symbols without links.
+#MAXIMUM 300 symbols without links.
+#DO NOT add Engagement levels or Sentiment
 """
 
 bullish_fud_score_prompt = "Process data, score twitter post from 1 to 100, where score 1 is TOP 1 Bearish/FUD, and score 100 is TOP 1 Bullish post based on post data provided for specified %s. Use engagement metrics to rate the post. #Answer only number."
