@@ -171,7 +171,11 @@ async def create_report(
     else:
         twitts_over_asset = ast.literal_eval(cash_data.decode("UTF-8"))
     if twitts_over_asset:
-        msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {[t.get('content') for t in twitts_over_asset]}"
+        twitter_news = []
+        for t in twitts_over_asset:
+            msg = f"There is official twitter post {twitter} over {full_token_name} ${symbol} {t.get('content')}. Process it like an update."
+            twitter_news.append(llama.send_message(message=msg, prompt=prompts.twikit_prompt_solo).replace("</s>", ""))
+        msg = f"There is data over {full_token_name} ${symbol} {twitter_news}. Process it and generate report with updates by points # <1>, <2> ..."
         data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt).replace("</s>", "")
     return data
 

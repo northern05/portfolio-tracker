@@ -58,7 +58,7 @@ prompts = {"price_movements": {
 twikit_prompt = """
 Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
 Identify mentions of cryptocurrency price updates, engagement levels (likes/retweets), and sentiment shifts. 
-Highlight any significant events or announcements. Also, summarize how the cryptocurrency community is reacting based on engagement metrics.
+Highlight any significant events or announcements. Drop duplicates.
 If No updates - write "No updates"
 ###Output Format###
 #### Updates 
@@ -67,6 +67,13 @@ If No updates - write "No updates"
 \n <3. updates> / up to 1 short sentence.
 #MAXIMUM 300 symbols without links.
 #DO NOT add Engagement levels or Sentiment
+"""
+
+twikit_prompt_solo = """
+Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
+Identify mentions of cryptocurrency price updates, engagement levels (likes/retweets), and sentiment shifts. 
+Highlight any significant events or announcements.
+###Output Format: 1 short sentence maximum 100 symbols.
 """
 
 bullish_fud_score_prompt = "Process data, score twitter post from 1 to 100, where score 1 is TOP 1 Bearish/FUD, and score 100 is TOP 1 Bullish post based on post data provided for specified %s. Use engagement metrics to rate the post. #Answer only number."
