@@ -58,20 +58,20 @@ prompts = {"price_movements": {
 twikit_prompt = """
 Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
 Identify mentions of cryptocurrency price updates, engagement levels (likes/retweets), and sentiment shifts. 
-Highlight any significant events or announcements. Drop duplicates.
+Highlight any significant events or announcements. 
 If No updates - write "No updates"
 ###Output Format###
 #### Updates 
 \n <1. updates> / up to 1 short sentence.
 \n <2. updates> / up to 1 short sentence.
 \n <3. updates> / up to 1 short sentence.
-#MAXIMUM 300 symbols without links.
+#MAXIMUM 300 symbols for all report.
 #DO NOT add Engagement levels or Sentiment
+#Drop duplicates if exists.
 """
 
 twikit_prompt_solo = """
-Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
-Identify mentions of cryptocurrency price updates, engagement levels (likes/retweets), and sentiment shifts. 
+Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns.  
 Highlight any significant events or announcements.
 ###Output Format: 1 short sentence maximum 100 symbols.
 """
