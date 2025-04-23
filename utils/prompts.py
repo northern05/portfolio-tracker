@@ -2,8 +2,9 @@ final_price_movements_prompt = """Generate a final for specified Token ticker re
 ###Output Format###
 #### Price Moves
 \n <content> / up to 1 short sentence.
-###Maximum 150 symbols.
-Do not add data that is not related to price movements here.
+#Maximum 150 symbols.
+#Do not add data that is not related to price movements here.
+#Drop all links if exists.
 """
 
 final_updates_prompt = """Generate a final report for specified Token ticker based on provided data from users message.
@@ -32,7 +33,7 @@ prompts = {"price_movements": {
     #                   "[Active source links at the end]. Maximum 200 symbols.",
     "chatgpt_prompt": final_price_movements_prompt,
     "title": "Price Moves",
-    "check": "Find some news about price movements about $%s?"
+    "check": "Is there any recent news about price movements about %s? #Answer only yes or not only."
 },
     # "related_news": {
     #     "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between %s and %s."
