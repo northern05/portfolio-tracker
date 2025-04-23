@@ -1,10 +1,12 @@
-final_price_movements_prompt = """Generate a final for specified Token ticker report based on provided data from users message
+final_price_movements_prompt = """#Generate a final for specified Token ticker report based on provided data from users message. Drop links.
 ###Output Format###
-#### Price Moves
+####Price Moves
 \n <content> / up to 1 short sentence.
-#Maximum 150 symbols.
+#Maximum 100 symbols.
 #Do not add data that is not related to price movements here.
-#Drop all links if exists.
+#Drop links if exists.
+#Ignore data you cannot process.
+#Don't tell what the report is about, provide specific data.
 """
 
 final_updates_prompt = """Generate a final report for specified Token ticker based on provided data from users message.
@@ -20,11 +22,13 @@ MAXIMUM 600 symbols without links.
 
 prompts = {"price_movements": {
     "perplexity_prompt": """
-            Retrieve news articles detailing actual price movements of %s strictly within %s and %s date range. Exclude any predictions or forecasts""",
+            Retrieve news articles detailing actual price movements of %s strictly within %s and %s date range. 
+            #Exclude any predictions or speculative forecasts.
+            #Return only high-quality sources. 
+            #If any content is behind paywalls, summarize key points.
+            #Dont add tables or data llm cannot process.""",
     "msg": """Price Movements & Market Trends:
-            Identify articles discussing past price movements and volatility for %s, %s, %s that occurred between %s and %s.
-            Exclude any predictions or speculative forecasts.
-            Please return only high-quality sources. If any content is behind paywalls, summarize key points.""",
+            Identify articles discussing past price movements and volatility for %s, %s, %s that occurred between %s and %s.""",
     # "chatgpt_prompt": "all this (news and prices) should be drawn up in the form of a template report and duplicates "
     #                   "should be removed template format: For each categorized article, generate a concise summary that includes: "
     #                   "- The headline - A brief description of the event (including the event date) "
@@ -57,15 +61,16 @@ prompts = {"price_movements": {
 }
 
 twikit_prompt = """
-Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
-Identify mentions of cryptocurrency price updates, engagement levels (likes/retweets), and sentiment shifts. 
-Highlight any significant events or announcements. 
-If No updates - write "No updates"
-###Output Format###
-#### Updates 
-\n <1. updates> / up to 1 short sentence.
-\n <2. updates> / up to 1 short sentence.
-\n <3. updates> / up to 1 short sentence.
+#Analyze the following Twitter posts from the official cryptocurrency account and extract news, key insights, trends, and patterns. 
+#Identify mentions of cryptocurrency price updates, engagement levels (likes/retweets), and sentiment shifts. 
+#Highlight any significant events or announcements. 
+#If No updates - write "No updates"
+#Output Format:
+#Updates 
+\n <1. updates> / #up to 100 symbols.
+\n <2. updates> / #up to 100 symbols.
+\n <3. updates> / #up to 100 symbols.
+#Limit up to 4-5 main updates.
 #MAXIMUM 300 symbols for all report.
 #DO NOT add Engagement levels or Sentiment
 #Drop duplicates if exists.
