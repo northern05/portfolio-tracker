@@ -58,10 +58,9 @@ def escape_markdown(text):
     """
     Escapes special characters for Telegram MarkdownV2 formatting.
     """
-    text = text.replace("**", "*")
     try:
         escape_chars = r'_*[]()~`>#+-=|{}.!'
-        result = re.sub(r'([%s])' % re.escape(escape_chars), r'\\\1', text).replace("</s>", "")
+        result = re.sub(r'([%s])' % re.escape(escape_chars), r'\\\1', text).replace("**", "*")
     except Exception as e:
         return None
     return result
