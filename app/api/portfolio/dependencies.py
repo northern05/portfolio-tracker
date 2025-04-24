@@ -161,7 +161,7 @@ async def create_report(
                 symbol, full_token_name, twitter, datetime.now() - timedelta(days=7), datetime.now()),
             prompt=v.get("perplexity_prompt") % (symbol, datetime.now() - timedelta(days=7), datetime.now())
         )
-        llama_processing = llama.send_message(message=perplexity_result.replace("</s>", ""),
+        llama_processing = llama.send_message(message=perplexity_result.replace("**", "*"),
                                               prompt=v.get("chatgpt_prompt"))
         setattr(data, k, llama_processing)
     cash_data = await redis_db.get(f"{symbol}_twitter_posts")
@@ -172,7 +172,7 @@ async def create_report(
         twitts_over_asset = ast.literal_eval(cash_data.decode("UTF-8"))
     if twitts_over_asset:
         msg = f"There is data from official {twitter} over {full_token_name} ${symbol} {[t.get('content') for t in twitts_over_asset]}"
-        data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt).replace("</s>", "")
+        data.twitter_news = llama.send_message(message=msg, prompt=prompts.twikit_prompt).replace("**", "*")
     return data
 
 
