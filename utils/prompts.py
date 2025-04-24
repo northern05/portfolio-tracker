@@ -82,5 +82,5 @@ Highlight any significant events or announcements.
 
 bullish_fud_score_prompt = "Process data, score twitter post from 1 to 100, where score 1 is TOP 1 Bearish/FUD, and score 100 is TOP 1 Bullish post based on post data provided for specified %s. Use engagement metrics to rate the post. #Answer only number."
 
-top_1_bullish = "Process data, and choose TOP 1 Bullish post based on post data provided for specified %s. #Return chosen post in JSON format."
-top_1_fud = "Process data, and choose TOP 1 Bearish/FUD post based on post data provided for specified %s. #Return chosen post in JSON format."
+top_1_bullish = "Process data, and choose TOP 1 Bullish post based on post data provided for specified %s. #Output only in JSON format. #DONT ADD TEXT."
+top_1_fud = "Process data, and choose TOP 1 Bearish/FUD post based on post data provided for specified %s. #Output only in JSON format. #DONT ADD TEXT."

@@ -112,19 +112,19 @@ async def get_sentiment_score(
         post["score"] = int(extract_rating(score))
     sorted_score_list = sorted(sentiment_score, key=lambda x: x.get("score", 0), reverse=True)
     bullish_post = llama.send_message(
-            prompt=prompts.top_1_bullish % portfolio.symbol,
-            message=f"Choose TOP 1 Bullish twitter post about ${portfolio.symbol} ({full_token_name} project): {sorted_score_list[:5]}."
-        )
-
+        prompt=prompts.top_1_bullish % portfolio.symbol,
+        message=f"Choose TOP 1 Bullish twitter post about ${portfolio.symbol} ({full_token_name} project): {sorted_score_list[:5]}."
+    )
+    bullish = await create_twitt_url(data=ast.literal_eval(bullish_post)[0])
     fud_post = llama.send_message(
         prompt=prompts.top_1_fud % portfolio.symbol,
         message=f"Choose TOP 1 Bearish/FUD twitter post about ${portfolio.symbol} ({full_token_name} project): {sorted_score_list[-5:]}."
     )
-    bullish = await create_twitt_url(data=json.loads(bullish_post.replace("</s>", "")))
-    fud = await create_twitt_url(data=json.loads(fud_post.replace("</s>", "")))
+    fud = await create_twitt_url(data=ast.literal_eval(fud_post)[0])
     response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
+
 
 def extract_rating(text):
     """Extracts the rating number from the LLM response."""
@@ -257,7 +257,8 @@ async def get_dataset(session: AsyncSession = Depends(db_helper.scoped_session_d
             perplexity_result = perplexity_driver.chat_without_streaming(
                 message=prompts.prompts.get("price_movements").get("msg") % (
                     token.symbol, full_token_name, token.twitter, datetime.now() - timedelta(days=7), datetime.now()),
-                prompt=prompts.prompts.get("price_movements").get("perplexity_prompt") % (token.symbol, datetime.now() - timedelta(days=7), datetime.now())
+                prompt=prompts.prompts.get("price_movements").get("perplexity_prompt") % (
+                token.symbol, datetime.now() - timedelta(days=7), datetime.now())
             )
             file.write("=" * 100)
             file.write("\n" + f"PERPLEXITY {token.symbol}" + "\n")
