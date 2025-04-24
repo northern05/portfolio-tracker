@@ -246,30 +246,35 @@ async def delete_portfolio(
 
 async def get_dataset(session: AsyncSession = Depends(db_helper.scoped_session_dependency)):
     all_tokens = await crud.get_all(session=session)
-    with open("data.txt", "a", encoding="utf-8") as file:
-        for token in all_tokens:
-            full_token_name = coin_gecko_driver.get_data_over_coingecko_id(token_id=token.coingecko_id).get("name")
-            file.write(full_token_name + "\n")
-            sentiment_score = elfa_driver.get_squeeze(symbol=token.symbol)
-            file.write("=" * 100)
-            file.write("\n" + f"SENTIMENT SCORE {token.symbol}" + "\n")
-            file.write(str(sentiment_score))
-            perplexity_result = perplexity_driver.chat_without_streaming(
-                message=prompts.prompts.get("price_movements").get("msg") % (
-                    token.symbol, full_token_name, token.twitter, datetime.now() - timedelta(days=7), datetime.now()),
-                prompt=prompts.prompts.get("price_movements").get("perplexity_prompt") % (
-                token.symbol, datetime.now() - timedelta(days=7), datetime.now())
-            )
-            file.write("=" * 100)
-            file.write("\n" + f"PERPLEXITY {token.symbol}" + "\n")
-            file.write(str(perplexity_result))
-            llama_processing = llama.send_message(message=perplexity_result.removesuffix("</s>"),
-                                                  prompt=prompts.prompts.get("price_movements").get("chatgpt_prompt"))
-            file.write("=" * 100)
-            file.write("\n" + f"LLAMA: {token.symbol}" + "\n")
-            file.write(str(llama_processing))
-            twitts_over_asset = await twitter_scraper.fetch_tweets(protocol_name=token.twitter.split("/")[-1])
-            file.write("=" * 100)
-            file.write("\n" + f"TWITS {token.symbol}" + "\n")
-            file.write(str(twitts_over_asset))
-            await asyncio.sleep(1800)
+    for token in all_tokens:
+        sm = get_sentiment_score(symbol=token.symbol, session=session)
+        sl = get_selected_portfolio(symbol=token.symbol, session=session)
+        await asyncio.sleep(100)
+
+    # with open("data.txt", "a", encoding="utf-8") as file:
+    #     for token in all_tokens:
+    #         full_token_name = coin_gecko_driver.get_data_over_coingecko_id(token_id=token.coingecko_id).get("name")
+    #         file.write(full_token_name + "\n")
+    #         sentiment_score = elfa_driver.get_squeeze(symbol=token.symbol)
+    #         file.write("=" * 100)
+    #         file.write("\n" + f"SENTIMENT SCORE {token.symbol}" + "\n")
+    #         file.write(str(sentiment_score))
+    #         perplexity_result = perplexity_driver.chat_without_streaming(
+    #             message=prompts.prompts.get("price_movements").get("msg") % (
+    #                 token.symbol, full_token_name, token.twitter, datetime.now() - timedelta(days=7), datetime.now()),
+    #             prompt=prompts.prompts.get("price_movements").get("perplexity_prompt") % (
+    #             token.symbol, datetime.now() - timedelta(days=7), datetime.now())
+    #         )
+    #         file.write("=" * 100)
+    #         file.write("\n" + f"PERPLEXITY {token.symbol}" + "\n")
+    #         file.write(str(perplexity_result))
+    #         llama_processing = llama.send_message(message=perplexity_result.removesuffix("</s>"),
+    #                                               prompt=prompts.prompts.get("price_movements").get("chatgpt_prompt"))
+    #         file.write("=" * 100)
+    #         file.write("\n" + f"LLAMA: {token.symbol}" + "\n")
+    #         file.write(str(llama_processing))
+    #         twitts_over_asset = await twitter_scraper.fetch_tweets(protocol_name=token.twitter.split("/")[-1])
+    #         file.write("=" * 100)
+    #         file.write("\n" + f"TWITS {token.symbol}" + "\n")
+    #         file.write(str(twitts_over_asset))
+    #         await asyncio.sleep(1800)
