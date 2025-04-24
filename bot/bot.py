@@ -273,7 +273,7 @@ async def get_report(callback: types.CallbackQuery):
             message_id=processing_message.message_id
         )
         message = f"📰 *News by {coin}:* \n {escaped_report} \n" if escaped_report else f"📰 *No updates over {coin}* \n"
-        message += f"\n 📰 *Price movements:* {escaped_prices} \n" if escaped_prices else ""
+        message += f"\n 📰 *Price movements:* \n {escaped_prices} \n" if escaped_prices else ""
         await callback.message.answer(message, parse_mode='MarkdownV2', disable_web_page_preview=True)
 
     response = requests.get(f"{API_URL}/selected/sentiment", params={"symbol": coin})
