@@ -150,6 +150,8 @@ class TwitterScraper:
                     next((acc['username'] for acc in self.accounts if self.clients[acc['username']] == current_client),
                          None))
                 continue
+            except KeyError as e:
+                return None
 
             if not tweets and not tweet_data:
                 logging.info(f"{datetime.now()} - No more tweets found")

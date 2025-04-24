@@ -13,9 +13,9 @@ final_updates_prompt = """Generate a final report for specified Token ticker bas
 If No updates - write "No updates"
 ###Output Format###
 #### Updates (do not include any data about price moves here, only investment, ecosystem updates, general news and major events)
-\n <1. updates> / up to 1 short sentences per each news maximum 200 symbols.
-\n <2. updates> / up to 1 short sentences per each news maximum 200 symbols.
-\n <3. updates> / up to 1 short sentences per each news maximum 200 symbols.
+\n 1. updates / up to 1 short sentences per each news maximum 200 symbols.
+\n 2. updates / up to 1 short sentences per each news maximum 200 symbols.
+\n 3. updates / up to 1 short sentences per each news maximum 200 symbols.
 MAXIMUM 600 symbols without links.
 #Active source links at the end.
 """
@@ -37,7 +37,7 @@ prompts = {"price_movements": {
     #                   "[Active source links at the end]. Maximum 200 symbols.",
     "chatgpt_prompt": final_price_movements_prompt,
     "title": "Price Moves",
-    "check": "Is there any recent news about price movements about %s? #Answer only yes or not only."
+    "check": "Find some news about price movements about $%s?"
 },
     # "related_news": {
     #     "perplexity_prompt": "retrieve news about the crypto asset %s focusing on events that occurred between %s and %s."
@@ -67,9 +67,9 @@ twikit_prompt = """
 #If No updates - write "No updates"
 #Output Format:
 #Updates 
-\n <1. updates> / #up to 100 symbols.
-\n <2. updates> / #up to 100 symbols.
-\n <3. updates> / #up to 100 symbols.
+\n 1. updates / #up to 100 symbols.
+\n 2. updates / #up to 100 symbols.
+\n 3. updates / #up to 100 symbols.
 #Limit up to 4-5 main updates.
 #MAXIMUM 300 symbols for all report.
 #DO NOT add Engagement levels or Sentiment
