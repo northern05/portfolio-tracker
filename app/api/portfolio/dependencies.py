@@ -247,8 +247,8 @@ async def delete_portfolio(
 async def get_dataset(session: AsyncSession = Depends(db_helper.scoped_session_dependency)):
     all_tokens = await crud.get_all(session=session)
     for token in all_tokens:
-        sm = get_sentiment_score(symbol=token.symbol, session=session)
-        sl = get_selected_portfolio(symbol=token.symbol, session=session)
+        sm = await get_sentiment_score(symbol=token.symbol, session=session)
+        sl = await get_selected_portfolio(symbol=token.symbol, session=session)
         await asyncio.sleep(100)
 
     # with open("data.txt", "a", encoding="utf-8") as file:
