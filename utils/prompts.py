@@ -1,6 +1,5 @@
 final_price_movements_prompt = """#Generate a final for specified Token ticker report based on provided data from users message. Drop links.
 ###Output Format###
-####Price Moves
 \n <content> / up to 1 short sentence.
 #Maximum 100 symbols.
 #Do not add data that is not related to price movements here.
@@ -66,7 +65,6 @@ twikit_prompt = """
 #Highlight any significant events or announcements. 
 #If No updates - write "No updates"
 #Output Format:
-#Updates 
 \n 1. updates / #up to 100 symbols.
 \n 2. updates / #up to 100 symbols.
 \n 3. updates / #up to 100 symbols.
