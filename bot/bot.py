@@ -262,11 +262,11 @@ async def get_report(callback: types.CallbackQuery):
     response = requests.get(f"{API_URL}/selected", params={"symbol": coin})
     if response.status_code == 200:
         data = response.json()
-        news = data.get('related_news').replace("</s>", "") if data.get('related_news') else data.get('twitter_news').replace("**", "*")
-        price_movements = data.get('price_movements').replace("**", "*")
+        news = data.get('related_news') if data.get('related_news') else data.get('twitter_news')
+        price_movements = data.get('price_movements')
         escaped_prices = escape_markdown(price_movements)
         # formated_urls = format_urls_in_report(news)
-        escaped_report = escape_markdown(news)
+        escaped_report = escape_markdown(news) if news else None
         price = data.get("current_price", "Undefined").get("price_usd", "N/A")
         await bot.delete_message(
             chat_id=processing_message.chat.id,
