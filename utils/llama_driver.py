@@ -26,14 +26,20 @@ class LlamaDriver:
         :param prompt: Controls response randomness (0.0 = deterministic, 1.0 = creative).
         :return: The response text from ChatGPT.
         """
-        for attempt in range(max_retries):
-            err_str = "[0_system]"
-            data = {"prompt": prompt, "msg": message}
-            response = requests.post(url="http://195.189.60.154:8000/generate", json=data)
-            if response.status_code == 200:
-                llm_result = response.json().get("response")
-                if err_str in llm_result:
-                    time.sleep(1)
-                    continue
-                else:
-                    return llm_result
+        # for attempt in range(max_retries):
+        #     err_str = "[0_system]"
+        #     data = {"prompt": prompt, "msg": message}
+        #     response = requests.post(url="http://195.189.60.154:8000/generate", json=data)
+        #     if response.status_code == 200:
+        #         llm_result = response.json().get("response")
+        #         if err_str in llm_result:
+        #             time.sleep(1)
+        #             continue
+        #         else:
+        #             return llm_result
+        data = {"messages": [{"role": "system", "content": prompt},
+                      {"role": "user", "content": message}]}
+        response = requests.post(url=self.BASE_URL, json=data)
+        if response.status_code == 200:
+            llm_result = response.json().get("choices")[0].get("message").get("content")
+            return llm_result
