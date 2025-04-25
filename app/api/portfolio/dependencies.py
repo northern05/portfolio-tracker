@@ -98,29 +98,29 @@ async def get_sentiment_score(
     else:
         sentiment_score = ast.literal_eval(cash_data.decode("UTF-8"))
     for post in sentiment_score:
-        is_post_about_crypto = llama.send_message(
+        is_post_about_crypto = llama.bullish_fud(
             prompt="You are data analyzer to define relation data to crypto asset.",
             message=f"Process data: {post.get('content')} and define is this data related to crypto asset ${portfolio.symbol} or {full_token_name} project. #Answer one word only: Yes or Not.")
         clean_response = re.sub(r'[^a-zA-Z\s]', '', is_post_about_crypto.replace("</s>", "")).lower()
         if clean_response == 'not':
             sentiment_score.remove(post)
             continue
-        score = llama.send_message(
+        score = llama.bullish_fud(
             prompt=prompts.bullish_fud_score_prompt % portfolio.symbol,
             message=f"Score twitter post about ${portfolio.symbol} ({full_token_name} project): {post.get('content')}. #Answer only number!"
         )
         post["score"] = int(extract_rating(score))
     sorted_score_list = sorted(sentiment_score, key=lambda x: x.get("score", 0), reverse=True)
-    bullish_post = llama.send_message(
+    bullish_post = llama.bullish_fud(
         prompt=prompts.top_1_bullish % portfolio.symbol,
         message=f"Choose TOP 1 Bullish twitter post about ${portfolio.symbol} ({full_token_name} project): {sorted_score_list[:5]}."
     )
-    bullish = extract_json(bullish_post)
-    fud_post = llama.send_message(
+    bullish = await create_twitt_url(bullish_post)
+    fud_post = llama.bullish_fud(
         prompt=prompts.top_1_fud % portfolio.symbol,
         message=f"Choose TOP 1 Bearish/FUD twitter post about ${portfolio.symbol} ({full_token_name} project): {sorted_score_list[-5:]}."
     )
-    fud = extract_json(fud_post)
+    fud = await create_twitt_url(fud_post)
     response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
@@ -135,22 +135,15 @@ def extract_rating(text):
     else:
         return 0
 
-async def extract_json(data: str):
-    if data.startswith('[') and data.endswith(']'):
-        try:
-            parsed = ast.literal_eval(data)
-            post = await create_twitt_url(data=parsed[0])
-        except (SyntaxError, ValueError) as e:
-            print(f"Failed to parse fud_post: {e}")
-            post = None
-    else:
-        print("Invalid input format:", data)
-        post = None
-    return post
 
-
-async def create_twitt_url(data: dict):
+async def create_twitt_url(text: str):
+    clean_str = re.sub(r'\]+}*\]*$', ']', text).replace("</s>", "")
+    data = ast.literal_eval(clean_str)
+    if isinstance(data, list): data = data[0]
+    if "bearish_post" in data.keys(): data = data.get("bearish_post")
+    if "bearish_fud_post" in data.keys(): data = data.get("bearish_fud_post")
     twitter_id, twitter_user_id = data.get("twitter_id"), data.get("twitter_user_id")
+    if not twitter_id and twitter_user_id: return None
     username = await twitter_scraper.get_username_by_user_id(user_id=twitter_user_id)
     return f"https://x.com/{username}/status/{twitter_id}"
 

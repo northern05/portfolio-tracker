@@ -51,7 +51,8 @@ class TwitterCredentialsSettings(BaseSettings):
 
 
 class LLamaSettings(BaseSettings):
-    LLAMA_URL: str = os.environ.get("LLAMA_URL", "http://195.189.60.154:1111/v1/chat/completions")
+    LLAMA_URL: str = os.environ.get("LLAMA_URL", "http://195.189.60.154:8000/generate")
+    MISTRAL_URL: str = os.environ.get("MISTRAL_URL", "http://195.189.60.154:1111/v1/chat/completions")
 
 
 config = Config()

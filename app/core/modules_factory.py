@@ -38,7 +38,7 @@ redis_db = Redis(
 )
 
 # -------- Initialize Llama connection -----------------------
-llama = LlamaDriver(base_url=llama_config.LLAMA_URL)
+llama = LlamaDriver(llama_url=llama_config.LLAMA_URL, mistral_url=llama_config.MISTRAL_URL)
 
 # --------- Initialize Twitter Scraper -----------------------
 twitter_scraper = TwitterScraper(

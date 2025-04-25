@@ -12,13 +12,14 @@ class AnswerFormat(BaseModel):
 
 
 class LlamaDriver:
-    def __init__(self, base_url: str):
+    def __init__(self, llama_url: str, mistral_url: str):
         """
         Initializes the ChatGPT API driver.
         """
-        self.BASE_URL = base_url
+        self.MISTRAL = mistral_url
+        self.BASE_LLAMA_URL = llama_url
 
-    def send_message(self, message: str, prompt: str, max_retries: int = 5):
+    def send_message(self, message: str, prompt: str):
         """
         Sends a message to ChatGPT and retrieves the response.
 
@@ -38,8 +39,15 @@ class LlamaDriver:
         #         else:
         #             return llm_result
         data = {"messages": [{"role": "system", "content": prompt},
-                      {"role": "user", "content": message}]}
-        response = requests.post(url=self.BASE_URL, json=data)
+                             {"role": "user", "content": message}]}
+        response = requests.post(url=self.MISTRAL, json=data)
         if response.status_code == 200:
             llm_result = response.json().get("choices")[0].get("message").get("content")
+            return llm_result
+
+    def bullish_fud(self, message: str, prompt: str):
+        data = {"prompt": prompt, "msg": message}
+        response = requests.post(url=self.BASE_LLAMA_URL, json=data)
+        if response.status_code == 200:
+            llm_result = response.json().get("response")
             return llm_result
