@@ -115,18 +115,12 @@ async def get_sentiment_score(
         prompt=prompts.top_1_bullish % portfolio.symbol,
         message=f"Choose TOP 1 Bullish twitter post about ${portfolio.symbol} ({full_token_name} project): {sorted_score_list[:5]}."
     )
-    extracted_json = extract_json(bullish_post)
-    bullish = None
-    if isinstance(extracted_json, dict):
-        bullish = await create_twitt_url(data=extracted_json)
+    bullish = extract_json(bullish_post)
     fud_post = llama.send_message(
         prompt=prompts.top_1_fud % portfolio.symbol,
         message=f"Choose TOP 1 Bearish/FUD twitter post about ${portfolio.symbol} ({full_token_name} project): {sorted_score_list[-5:]}."
     )
-    fud = None
-    extracted_json = extract_json(fud_post)
-    if isinstance(extracted_json, dict):
-        fud = await create_twitt_url(data=extracted_json)
+    fud = extract_json(fud_post)
     response_data = SentimentScore(bullish=bullish, fud=fud)
     await redis_db.set(f"{portfolio.symbol}_sentiment", response_data.json(), ex=86400)
     return response_data
@@ -141,7 +135,7 @@ def extract_rating(text):
     else:
         return 0
 
-def extract_json(data: str):
+async def extract_json(data: str):
     if data.startswith('[') and data.endswith(']'):
         try:
             parsed = ast.literal_eval(data)
