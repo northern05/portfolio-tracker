@@ -101,8 +101,8 @@ async def get_sentiment_score(
         is_post_about_crypto = llama.bullish_fud(
             prompt="You are data analyzer to define relation data to crypto asset.",
             message=f"Process data: {post.get('content')} and define is this data related to crypto asset ${portfolio.symbol} or {full_token_name} project. #Answer one word only: Yes or Not.")
-        clean_response = re.sub(r'[^a-zA-Z\s]', '', is_post_about_crypto.replace("</s>", "")).lower()
-        if clean_response == 'not':
+        clean_response = re.sub(r'[^a-zA-Z\s]', '', is_post_about_crypto).replace("</s>", "").lower() if is_post_about_crypto else None
+        if clean_response == 'not' or not clean_response:
             sentiment_score.remove(post)
             continue
         score = llama.bullish_fud(
@@ -256,7 +256,7 @@ async def get_dataset(session: AsyncSession = Depends(db_helper.scoped_session_d
         print(token.symbol)
         sm = await get_sentiment_score(symbol=token.symbol, session=session)
         sl = await get_selected_portfolio(symbol=token.symbol, session=session)
-        await asyncio.sleep(100)
+        # await asyncio.sleep(100)
 
     # with open("data.txt", "a", encoding="utf-8") as file:
     #     for token in all_tokens:
