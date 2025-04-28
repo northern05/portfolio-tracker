@@ -28,6 +28,7 @@ class TwitterScraper:
                 self.clients[account['username']] = client
                 self.login_states[account['username']] = True
                 logging.info(f"Successfully logged in with account: {account['username']}")
+                self.client_initialized = True
             except Exception as e:
                 logging.error(f"Failed to login with account {account['username']}: {e}")
                 self.clients[account['username']] = None  # Mark as failed

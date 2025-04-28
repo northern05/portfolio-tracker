@@ -98,7 +98,7 @@ async def get_sentiment_score(
     else:
         sentiment_score = ast.literal_eval(cash_data.decode("UTF-8"))
     for post in sentiment_score:
-        is_post_about_crypto = llama.bullish_fud(
+        is_post_about_crypto = llama.send_message(
             prompt="You are data analyzer to define relation data to crypto asset.",
             message=f"Process data: {post.get('content')} and define is this data related to crypto asset ${portfolio.symbol} or {full_token_name} project. #Answer one word only: Yes or Not.")
         clean_response = re.sub(r'[^a-zA-Z\s]', '', is_post_about_crypto).replace("</s>", "").lower() if is_post_about_crypto else None
