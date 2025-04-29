@@ -61,7 +61,7 @@ async def get_selected_portfolio(
             detail=errors.portfolio_errors.PROJECT_NOT_FOUND
         )
     response_data = PortfolioResponseExtended.from_orm(portfolio)
-    response_data.current_price = cmc_driver.get_current_token_price(symbol=portfolio.coingecko_id)
+    response_data.current_price = cmc_driver.get_current_token_price(slug=portfolio.coingecko_id)
     full_token_name = coin_gecko_driver.get_data_over_coingecko_id(token_id=portfolio.coingecko_id).get("name")
     response_data = await create_report(
         symbol=portfolio.symbol,
