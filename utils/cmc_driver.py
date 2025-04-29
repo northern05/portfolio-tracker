@@ -36,7 +36,7 @@ class CoinMarketCapDriver:
         top_similar_tokens = sorted(similar_tokens, key=lambda x: x["market_cap"], reverse=True)[:10]
         return top_similar_tokens
 
-    def get_current_token_price(self, symbol: str):
+    def get_current_token_price(self, slug: str):
         """Fetches the current price of a given token by its symbol."""
 
         # Step 1: Get token ID from symbol
@@ -49,10 +49,10 @@ class CoinMarketCapDriver:
         data = response.json().get("data", [])
 
         # Find the exact match for the token symbol
-        token = next((t for t in data if t["symbol"].upper() == symbol.upper()), None)
+        token = next((t for t in data if t["slug"].lower() == slug.lower()), None)
 
         if not token:
-            return {"error": f"Token '{symbol}' not found"}
+            return {"error": f"Token '{slug}' not found"}
 
         token_id = token["id"]
 
